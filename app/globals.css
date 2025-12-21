@@ -45,7 +45,20 @@ body {
 
   /* Input */
   .input {
-    @apply w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-200 focus:border-primary-500 transition-all duration-200 text-base;
+    @apply w-full px-4 py-3.5 border-2 border-gray-300 rounded-xl bg-white text-base text-gray-900 placeholder-gray-400 transition-all duration-200;
+    @apply focus:ring-4 focus:ring-primary-200 focus:border-primary-500 focus:bg-white;
+    @apply hover:border-gray-400;
+    @apply disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500;
+  }
+  
+  /* Input with value (filled state) */
+  .input:not(:placeholder-shown) {
+    @apply border-gray-400 bg-gray-50;
+  }
+  
+  /* Input error state */
+  .input-error {
+    @apply border-red-500 focus:ring-red-200 focus:border-red-500;
   }
 }
 

@@ -1,18 +1,55 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { onAuthChange, signOut, getCurrentUserData, UserData } from '@/lib/auth'
 
 export default function Header() {
     const pathname = usePathname()
+    const router = useRouter()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [userData, setUserData] = useState<UserData | null>(null)
+    const [userMenuOpen, setUserMenuOpen] = useState(false)
 
-    const navLinks = [
-        { href: '/', label: 'Home' },
-        { href: '/feedback', label: 'Give Feedback' },
-        { href: '/dashboard', label: 'Dashboard' },
-    ]
+    useEffect(() => {
+        // Listen for auth state changes
+        const unsubscribe = onAuthChange(async (user) => {
+            if (user) {
+                const data = await getCurrentUserData()
+                setUserData(data)
+            } else {
+                setUserData(null)
+            }
+        })
+
+        return () => unsubscribe()
+    }, [])
+
+    const handleSignOut = async () => {
+        try {
+            await signOut()
+            router.push('/login')
+        } catch (error) {
+            console.error('Sign out error:', error)
+        }
+    }
+
+    const navLinks = userData
+        ? userData.role === 'admin'
+            ? [
+                { href: '/', label: 'Home' },
+                { href: '/dashboard', label: 'Dashboard' },
+            ]
+            : [
+                { href: '/', label: 'Home' },
+                { href: '/feedback', label: 'Give Feedback' },
+            ]
+        : [
+            { href: '/', label: 'Home' },
+            { href: '/feedback', label: 'Give Feedback' },
+            { href: '/dashboard', label: 'Dashboard' },
+        ]
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -25,7 +62,7 @@ export default function Header() {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex space-x-8">
+                    <div className="hidden md:flex items-center space-x-8">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.href}
@@ -38,6 +75,43 @@ export default function Header() {
                                 {link.label}
                             </Link>
                         ))}
+
+                        {/* User Menu */}
+                        {userData ? (
+                            <div className="relative">
+                                <button
+                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                        {userData.email[0].toUpperCase()}
+                                    </div>
+                                    <span>{userData.role === 'admin' ? '👨‍💼' : '🎓'}</span>
+                                </button>
+
+                                {userMenuOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                                        <div className="px-4 py-2 border-b border-gray-200">
+                                            <p className="text-sm font-semibold text-gray-900">{userData.email}</p>
+                                            <p className="text-xs text-gray-600 capitalize">{userData.role}</p>
+                                        </div>
+                                        <button
+                                            onClick={handleSignOut}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                        >
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
+                            >
+                                Sign In
+                            </Link>
+                        )}
                     </div>
 
                     {/* Mobile menu button */}
@@ -79,6 +153,28 @@ export default function Header() {
                                 {link.label}
                             </Link>
                         ))}
+
+                        {userData ? (
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="px-3 py-2">
+                                    <p className="text-sm font-semibold text-gray-900">{userData.email}</p>
+                                    <p className="text-xs text-gray-600 capitalize">{userData.role}</p>
+                                </div>
+                                <button
+                                    onClick={handleSignOut}
+                                    className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                                >
+                                    Sign Out
+                                </button>
+                            </div>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="block mt-4 px-3 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 text-center"
+                            >
+                                Sign In
+                            </Link>
+                        )}
                     </div>
                 )}
             </nav>

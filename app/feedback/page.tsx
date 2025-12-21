@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db, signInAnonymouslyHelper } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
 
 const EMOJI_RATINGS = [
     { emoji: '😄', label: 'Loved it!', value: 4 },
@@ -32,11 +32,18 @@ export default function FeedbackPage() {
         setIsSubmitting(true)
 
         try {
-            // Ensure user is signed in anonymously
-            await signInAnonymouslyHelper()
+            // Get current authenticated user
+            const { auth } = await import('@/lib/firebase')
+            const user = auth.currentUser
+
+            if (!user) {
+                alert('Please sign in to submit feedback')
+                return
+            }
 
             // Submit feedback to Firestore
             await addDoc(collection(db, 'feedback'), {
+                uid: user.uid,
                 mealType,
                 dishName,
                 rating,
@@ -127,8 +134,8 @@ export default function FeedbackPage() {
                                         type="button"
                                         onClick={() => setRating(item.value)}
                                         className={`p-6 rounded-2xl border-3 transition-all transform hover:scale-105 active:scale-95 ${rating === item.value
-                                                ? 'border-primary-600 bg-primary-50 shadow-xl ring-4 ring-primary-200'
-                                                : 'border-gray-200 hover:border-primary-400 hover:bg-gray-50'
+                                            ? 'border-primary-600 bg-primary-50 shadow-xl ring-4 ring-primary-200'
+                                            : 'border-gray-200 hover:border-primary-400 hover:bg-gray-50'
                                             }`}
                                     >
                                         <div className="text-6xl mb-3">{item.emoji}</div>
@@ -147,8 +154,8 @@ export default function FeedbackPage() {
                                 type="button"
                                 onClick={() => setVoiceNote(!voiceNote)}
                                 className={`w-full sm:w-auto px-8 py-4 rounded-xl border-2 transition-all flex items-center justify-center space-x-3 font-semibold ${voiceNote
-                                        ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-lg'
-                                        : 'border-gray-300 text-gray-700 hover:border-primary-400 hover:bg-gray-50'
+                                    ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-lg'
+                                    : 'border-gray-300 text-gray-700 hover:border-primary-400 hover:bg-gray-50'
                                     }`}
                             >
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
