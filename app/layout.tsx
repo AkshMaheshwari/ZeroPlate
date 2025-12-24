@@ -18,8 +18,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
+                {/* Header is global - shows on Home, Feedback, and Dashboard */}
                 <Header />
-                <main className="min-h-screen">
+                <main className="min-h-screen bg-gray-50">
                     {children}
                 </main>
             </body>

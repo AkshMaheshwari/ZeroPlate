@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signInUser } from '@/lib/auth'
+import { signInUser, signInWithGoogle } from '@/lib/auth'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -12,6 +12,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
+    // Email/Password Login Handler
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
@@ -33,6 +34,27 @@ export default function LoginPage() {
         }
     }
 
+    // Google Sign-In Handler
+    const handleGoogleSignIn = async () => {
+        setError('')
+        setLoading(true)
+
+        try {
+            const userData = await signInWithGoogle()
+
+            // Redirect based on role returned from Google Auth logic
+            if (userData.role === 'admin') {
+                router.push('/dashboard')
+            } else {
+                router.push('/feedback')
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to sign in with Google')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
@@ -48,7 +70,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Login Form */}
-                <div className="card p-8 border-2 border-gray-100">
+                <div className="card p-8 border-2 border-gray-100 bg-white rounded-2xl shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Email Input */}
                         <div>
@@ -61,7 +83,7 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="student@university.edu"
-                                className="input"
+                                className="input w-full p-3 border rounded-xl"
                                 required
                                 autoComplete="email"
                                 autoFocus
@@ -79,7 +101,7 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="input"
+                                className="input w-full p-3 border rounded-xl"
                                 required
                                 autoComplete="current-password"
                             />
@@ -92,11 +114,11 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        {/* Submit Button */}
+                        {/* Email/Password Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-primary w-full py-4 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="btn-primary w-full py-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center">
@@ -104,7 +126,7 @@ export default function LoginPage() {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Signing in...
+                                    Processing...
                                 </span>
                             ) : (
                                 '🔐 Sign In'
@@ -112,8 +134,33 @@ export default function LoginPage() {
                         </button>
                     </form>
 
+                    {/* Divider */}
+                    <div className="relative my-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm uppercase">
+                            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    {/* Google Sign-In Button */}
+                    <button
+                        type="button"
+                        onClick={handleGoogleSignIn}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-4 border-2 border-gray-100 rounded-xl bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-50"
+                    >
+                        <img 
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                            className="w-6 h-6" 
+                            alt="Google" 
+                        />
+                        Sign in with Google
+                    </button>
+
                     {/* Sign Up Link */}
-                    <div className="mt-6 text-center">
+                    <div className="mt-8 text-center">
                         <p className="text-sm text-gray-600">
                             Don&apos;t have an account?{' '}
                             <Link href="/signup" className="font-semibold text-primary-600 hover:text-primary-700">

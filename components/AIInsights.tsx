@@ -1,78 +1,100 @@
-const AI_SUGGESTIONS = [
-    {
-        id: 1,
-        priority: 'high',
-        suggestion: 'Reduce rice quantity by 15% based on consistent leftover patterns',
-        impact: 'Could save ~5kg daily'
-    },
-    {
-        id: 2,
-        priority: 'medium',
-        suggestion: 'Replace dal tadka with dal makhani on Thursdays (higher ratings)',
-        impact: 'Improve satisfaction by 20%'
-    },
-    {
-        id: 3,
-        priority: 'high',
-        suggestion: 'Introduce portion size options for heavy eaters vs light eaters',
-        impact: 'Reduce waste by 25%'
-    },
-    {
-        id: 4,
-        priority: 'low',
-        suggestion: 'Add more variety in breakfast menu based on feedback',
-        impact: 'Boost morning attendance'
-    },
-]
+'use client'
 
-export default function AIInsights() {
-    return (
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-md p-6">
-            <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-purple-600 rounded-lg p-3">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 className="text-xl font-bold text-gray-900">AI Insights</h3>
-                    <p className="text-sm text-gray-600">Powered by Gemini AI</p>
-                </div>
-            </div>
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { collection, getDocs, limit, query, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase"; 
 
-            <div className="space-y-3">
-                {AI_SUGGESTIONS.map((item) => (
-                    <div
-                        key={item.id}
-                        className="bg-white rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow"
-                        style={{
-                            borderLeftColor:
-                                item.priority === 'high' ? '#ef4444' :
-                                    item.priority === 'medium' ? '#f59e0b' :
-                                        '#3b82f6'
-                        }}
-                    >
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <p className="text-gray-900 font-medium mb-1">{item.suggestion}</p>
-                                <p className="text-sm text-gray-500">💡 {item.impact}</p>
-                            </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.priority === 'high' ? 'bg-red-100 text-red-700' :
-                                    item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-blue-100 text-blue-700'
-                                }`}>
-                                {item.priority.toUpperCase()}
-                            </span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+// Define what an Insight looks like to satisfy TypeScript
+interface Insight {
+  id: number;
+  suggestion: string;
+  impact: string;
+  priority: string;
+}
 
-            <div className="mt-4 p-3 bg-purple-100 rounded-lg">
-                <p className="text-sm text-purple-900">
-                    <strong>Note:</strong> These insights are generated based on feedback patterns and can be enhanced with real-time Gemini AI API integration.
-                </p>
+export default function AllInsights() {
+  const [suggestions, setSuggestions] = useState<Insight[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getAIAnalysis();
+  }, []);
+
+  const getAIAnalysis = async () => {
+    setLoading(true);
+    setError(null); // Clear previous errors
+    
+    try {
+      const feedbackRef = collection(db, "feedback");
+      const q = query(feedbackRef, orderBy("timestamp", "desc"), limit(10));
+      const snap = await getDocs(q);
+      const data = snap.docs.map(doc => doc.data());
+
+      if (data.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      // Ensure your backend (node index.js) is running on port 3001
+      const res = await axios.post("http://localhost:3001/analyze-waste", {
+        feedbackData: data
+      });
+
+      setSuggestions(res.data.insights || []);
+    } catch (err: any) {
+      console.error("Connection Error:", err);
+      // Fixed the red line by ensuring we only pass a string
+      setError("AI Server is offline. Please start the backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-[#1e1b4b] rounded-2xl p-6 text-white border border-indigo-500/30 shadow-2xl mt-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold flex items-center gap-2">
+          <span className="text-yellow-400">✨</span> AI Waste Analysis
+        </h3>
+        <p className="text-xs text-indigo-300">Live insights from recent feedback</p>
+      </div>
+
+      <div className="space-y-4">
+        {loading ? (
+          <div className="flex flex-col items-center py-10 space-y-4">
+            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-indigo-300 text-sm animate-pulse">Consulting Gemini AI...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-6 text-red-400 bg-red-900/20 rounded-xl border border-red-500/50">
+            <p className="text-sm font-medium">{error}</p>
+            <p className="text-[10px] mt-1 opacity-70 italic">Check your terminal: cd server && node index.js</p>
+          </div>
+        ) : suggestions.length > 0 ? (
+          suggestions.map((item, index) => (
+            <div 
+              key={index} 
+              className="bg-white/5 p-4 rounded-xl border-l-4 border-indigo-500 hover:bg-white/10 transition-all"
+            >
+              <div className="flex justify-between items-start">
+                <p className="text-sm font-medium text-gray-100">{item.suggestion}</p>
+                <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${
+                  item.priority === 'High' ? 'bg-red-900/40 text-red-400' : 'bg-blue-900/40 text-blue-400'
+                }`}>
+                  {item.priority}
+                </span>
+              </div>
+              <p className="text-[11px] text-indigo-400 mt-2 font-mono uppercase">
+                Impact: {item.impact}
+              </p>
             </div>
-        </div>
-    )
+          ))
+        ) : (
+          <p className="text-center text-indigo-300/60 text-sm py-10">No feedback data found in database.</p>
+        )}
+      </div>
+    </div>
+  );
 }

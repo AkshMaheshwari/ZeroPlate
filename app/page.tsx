@@ -1,6 +1,22 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { onAuthChange } from '@/lib/auth'
+import { User } from 'firebase/auth'
 
 export default function HomePage() {
+    const [user, setUser] = useState<User | null>(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const unsubscribe = onAuthChange((currentUser) => {
+            setUser(currentUser)
+            setLoading(false)
+        })
+        return () => unsubscribe()
+    }, [])
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-green-50">
             {/* Hero Section */}
@@ -25,27 +41,40 @@ export default function HomePage() {
                         AI-powered insights to help mess halls reduce waste by up to 40%
                     </p>
 
-                    {/* CTA Buttons */}
+                    {/* CTA Buttons - Dynamic based on Auth */}
                     <div className="flex flex-col sm:flex-row gap-5 justify-center mb-20">
-                        <Link
-                            href="/feedback"
-                            className="btn-primary text-lg px-10 py-5"
-                        >
-                            🎯 Give Feedback
-                        </Link>
-                        <Link
-                            href="/dashboard"
-                            className="btn-secondary text-lg px-10 py-5"
-                        >
-                            📊 Admin Dashboard
-                        </Link>
+                        {loading ? (
+                            <div className="h-16 w-48 bg-gray-200 animate-pulse rounded-xl"></div>
+                        ) : !user ? (
+                            <Link
+                                href="/login"
+                                className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center"
+                            >
+                                🚀 Get Started / Login
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/feedback"
+                                    className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center"
+                                >
+                                    🎯 Give Feedback
+                                </Link>
+                                <Link
+                                    href="/dashboard"
+                                    className="btn-secondary text-lg px-10 py-5 border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all text-center"
+                                >
+                                    📊 Admin Dashboard
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 {/* Problem & Solution Section */}
                 <div className="mt-24 grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                     {/* Problem */}
-                    <div className="card p-10 border-2 border-gray-100">
+                    <div className="card p-10 border-2 border-gray-100 bg-white rounded-2xl">
                         <div className="text-5xl mb-6">⚠️</div>
                         <h2 className="text-3xl font-bold text-gray-900 mb-5">The Problem</h2>
                         <p className="text-gray-600 leading-relaxed text-lg">
@@ -106,7 +135,7 @@ export default function HomePage() {
 
                 {/* Team Section */}
                 <div className="mt-24 text-center">
-                    <div className="inline-block card px-12 py-8 border-2 border-primary-100">
+                    <div className="inline-block bg-white px-12 py-8 border-2 border-primary-100 rounded-2xl shadow-sm">
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Built by A² Labs</h3>
                         <p className="text-xl text-primary-600 font-semibold">Aksh & Aditi</p>
                     </div>
@@ -118,7 +147,7 @@ export default function HomePage() {
 
 function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
     return (
-        <div className="card p-8 border border-gray-100 group hover:border-primary-200 transition-all">
+        <div className="bg-white p-8 border border-gray-100 group hover:border-primary-200 transition-all rounded-2xl shadow-sm">
             <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{icon}</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
             <p className="text-gray-600 leading-relaxed">{description}</p>

@@ -4,10 +4,11 @@ import {
     createUserWithEmailAndPassword,
     signOut as firebaseSignOut,
     onAuthStateChanged,
-    User
+    User,
+    signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { auth, db, googleProvider } from './firebase';
 
 export type UserRole = 'student' | 'admin';
 
@@ -16,6 +17,32 @@ export interface UserData {
     email: string;
     role: UserRole;
     createdAt: Date;
+}
+// --- ADD THIS NEW FUNCTION BELOW ---
+export async function signInWithGoogle(): Promise<UserData> {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        // Check if user exists in Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+        if (!userDoc.exists()) {
+            // Create new record for first-time Google users
+            const userData: UserData = {
+                uid: user.uid,
+                email: user.email || '',
+                role: 'student', // Default role
+                createdAt: new Date()
+            };
+            await setDoc(doc(db, 'users', user.uid), userData);
+            return userData;
+        }
+
+        return userDoc.data() as UserData;
+    } catch (error: any) {
+        throw new Error(error.message || 'Failed to sign in with Google');
+    }
 }
 
 // Sign up new user with role
