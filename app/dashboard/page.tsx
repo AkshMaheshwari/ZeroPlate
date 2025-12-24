@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+import { collection, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { isAdmin, onAuthChange } from '@/lib/auth'
 import OverviewCards from '@/components/OverviewCards'
@@ -10,19 +10,19 @@ import RatingsChart from '@/components/charts/RatingsChart'
 import SentimentChart from '@/components/charts/SentimentChart'
 import AIInsights from '@/components/AIInsights'
 import FeedbackTable from '@/components/FeedbackTable'
-
-// Mock data for demo purposes
-const MOCK_STATS = {
-    avgRating: 3.2,
-    sentimentDist: { positive: 45, neutral: 35, negative: 20 },
-    estimatedWaste: 23.5
-}
+import WastageTracker from '@/components/WastageTracker'
+import WastageStats from '@/components/WastageStats'
 
 export default function DashboardPage() {
     const router = useRouter()
     const [feedbackData, setFeedbackData] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [checking, setChecking] = useState(true)
+    const [stats, setStats] = useState({
+        avgRating: 0,
+        sentimentDist: { positive: 0, neutral: 0, negative: 0 },
+        estimatedWaste: 0
+    })
 
     // Check if user is admin
     useEffect(() => {
@@ -46,27 +46,75 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if (!checking) {
-            fetchFeedback()
+            fetchDashboardData()
         }
     }, [checking])
 
-    const fetchFeedback = async () => {
+    const fetchDashboardData = async () => {
         try {
-            const q = query(
+            // Fetch recent feedback
+            const feedbackQuery = query(
                 collection(db, 'feedback'),
                 orderBy('timestamp', 'desc'),
-                limit(10)
+                limit(20)
             )
-            const querySnapshot = await getDocs(q)
-            const data = querySnapshot.docs.map(doc => ({
+            const feedbackSnapshot = await getDocs(feedbackQuery)
+            const feedback = feedbackSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }))
-            setFeedbackData(data)
+            setFeedbackData(feedback)
+
+            // Calculate average rating
+            let totalRating = 0
+            let sentimentCount = { positive: 0, neutral: 0, negative: 0 }
+
+            feedback.forEach((item: any) => {
+                if (item.rating) totalRating += item.rating
+                if (item.sentiment) {
+                    const sentiment = item.sentiment.toLowerCase()
+                    if (sentiment in sentimentCount) {
+                        sentimentCount[sentiment as keyof typeof sentimentCount]++
+                    }
+                }
+            })
+
+            const avgRating = feedback.length > 0 ? totalRating / feedback.length : 0
+            const total = sentimentCount.positive + sentimentCount.neutral + sentimentCount.negative
+            const sentimentDist = {
+                positive: total > 0 ? Math.round((sentimentCount.positive / total) * 100) : 0,
+                neutral: total > 0 ? Math.round((sentimentCount.neutral / total) * 100) : 0,
+                negative: total > 0 ? Math.round((sentimentCount.negative / total) * 100) : 0
+            }
+
+            // Fetch today's wastage
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+
+            const wastageQuery = query(
+                collection(db, 'dailyWastage'),
+                where('date', '>=', Timestamp.fromDate(today)),
+                orderBy('date', 'desc')
+            )
+            const wastageSnapshot = await getDocs(wastageQuery)
+            let totalWastage = 0
+            wastageSnapshot.docs.forEach(doc => {
+                totalWastage += doc.data().wastageKg || 0
+            })
+
+            setStats({
+                avgRating,
+                sentimentDist,
+                estimatedWaste: totalWastage
+            })
         } catch (error) {
-            console.error('Error fetching feedback:', error)
-            // Continue with empty data if Firebase is not configured
-            setFeedbackData([])
+            console.error('Error fetching dashboard data:', error)
+            // Use default values if fetch fails
+            setStats({
+                avgRating: 0,
+                sentimentDist: { positive: 0, neutral: 0, negative: 0 },
+                estimatedWaste: 0
+            })
         } finally {
             setLoading(false)
         }
@@ -102,15 +150,21 @@ export default function DashboardPage() {
 
                 {/* Overview Cards */}
                 <OverviewCards
-                    avgRating={MOCK_STATS.avgRating}
-                    sentimentDist={MOCK_STATS.sentimentDist}
-                    estimatedWaste={MOCK_STATS.estimatedWaste}
+                    avgRating={stats.avgRating}
+                    sentimentDist={stats.sentimentDist}
+                    estimatedWaste={stats.estimatedWaste}
                 />
 
                 {/* Charts Section */}
                 <div className="mt-12 grid lg:grid-cols-2 gap-8">
                     <RatingsChart />
-                    <SentimentChart sentimentDist={MOCK_STATS.sentimentDist} />
+                    <SentimentChart sentimentDist={stats.sentimentDist} />
+                </div>
+
+                {/* Wastage Management Section */}
+                <div className="mt-12 grid lg:grid-cols-2 gap-8">
+                    <WastageTracker />
+                    <WastageStats />
                 </div>
 
                 {/* AI Insights */}

@@ -97,25 +97,36 @@ export default function FeedbackPage() {
                 <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Meal Type</label>
+                            <label htmlFor="meal-type" className="block text-sm font-bold text-gray-700 mb-2">Meal Type</label>
                             <select 
+                                id="meal-type"
                                 value={mealType} 
                                 onChange={(e) => setMealType(e.target.value)}
-                                className="w-full p-3 border rounded-xl"
+                                className="w-full p-3 border border-gray-300 rounded-xl text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent appearance-none cursor-pointer"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
+                                    backgroundPosition: 'right 0.5rem center',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundSize: '1.5em 1.5em',
+                                    paddingRight: '2.5rem'
+                                }}
+                                required
                             >
-                                <option value="">Select a meal</option>
+                                <option value="" disabled>Select a meal</option>
                                 {MEAL_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Dish Name</label>
+                            <label htmlFor="dish-name" className="block text-sm font-bold text-gray-700 mb-2">Dish Name</label>
                             <input 
+                                id="dish-name"
                                 type="text" 
                                 value={dishName} 
                                 onChange={(e) => setDishName(e.target.value)}
-                                className="w-full p-3 border rounded-xl"
+                                className="w-full p-3 border border-gray-300 rounded-xl text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                                 placeholder="What did you eat?"
+                                required
                             />
                         </div>
 
@@ -127,10 +138,10 @@ export default function FeedbackPage() {
                                         key={item.value}
                                         type="button"
                                         onClick={() => setRating(item.value)}
-                                        className={`p-4 rounded-xl border-2 transition-all ${rating === item.value ? 'border-primary-600 bg-primary-50' : 'border-gray-100'}`}
+                                        className={`p-4 rounded-xl border-2 transition-all ${rating === item.value ? 'border-primary-600 bg-primary-50' : 'border-gray-100 hover:border-gray-300'}`}
                                     >
                                         <div className="text-3xl">{item.emoji}</div>
-                                        <div className="text-xs mt-1 font-bold">{item.label}</div>
+                                        <div className="text-xs mt-1 font-bold text-gray-700">{item.label}</div>
                                     </button>
                                 ))}
                             </div>
@@ -139,7 +150,7 @@ export default function FeedbackPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 disabled:bg-gray-400"
+                            className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 disabled:bg-gray-400 transition-colors"
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
                         </button>

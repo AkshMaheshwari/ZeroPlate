@@ -5,7 +5,7 @@ export default function OverviewCards({
 }: {
     avgRating: number
     sentimentDist: { positive: number; neutral: number; negative: number }
-    estimatedWaste: number
+    estimatedWaste: number  // Now receives real data from parent
 }) {
     return (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">

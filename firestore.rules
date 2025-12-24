@@ -39,6 +39,18 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     
+    // Daily wastage collection
+    match /dailyWastage/{wastageId} {
+      // Only admins can read all wastage data
+      allow read: if isAdmin();
+      
+      // Only admins can create wastage entries
+      allow create: if isAdmin();
+      
+      // Only admins can update/delete wastage entries
+      allow update, delete: if isAdmin();
+    }
+    
     // Analytics data (optional - for future use)
     match /analytics/{document=**} {
       // Only admins can read analytics
