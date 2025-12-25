@@ -1,7 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import Link from 'next/link'
+import {
+    UtensilsCrossed,
+    Rocket,
+    Target,
+    BarChart3,
+    AlertTriangle,
+    Sparkles,
+    Bot,
+    Smartphone,
+    TrendingDown,
+    PiggyBank,
+    Leaf,
+} from 'lucide-react'
 import { onAuthChange } from '@/lib/auth'
 import { User } from 'firebase/auth'
 
@@ -25,7 +38,7 @@ export default function HomePage() {
                     {/* Logo & Branding */}
                     <div className="flex justify-center mb-8">
                         <div className="bg-white rounded-3xl p-8 shadow-2xl ring-1 ring-primary-100">
-                            <span className="text-7xl">🍽️</span>
+                            <UtensilsCrossed className="w-16 h-16 text-primary-600" />
                         </div>
                     </div>
 
@@ -48,23 +61,23 @@ export default function HomePage() {
                         ) : !user ? (
                             <Link
                                 href="/login"
-                                className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center"
+                                className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center flex items-center justify-center gap-2"
                             >
-                                🚀 Get Started / Login
+                                <Rocket className="w-5 h-5" /> Get Started / Login
                             </Link>
                         ) : (
                             <>
                                 <Link
                                     href="/feedback"
-                                    className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center"
+                                    className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center flex items-center justify-center gap-2"
                                 >
-                                    🎯 Give Feedback
+                                    <Target className="w-5 h-5" /> Give Feedback
                                 </Link>
                                 <Link
                                     href="/dashboard"
-                                    className="btn-secondary text-lg px-10 py-5 border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all text-center"
+                                    className="btn-secondary text-lg px-10 py-5 border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all text-center flex items-center justify-center gap-2"
                                 >
-                                    📊 Admin Dashboard
+                                    <BarChart3 className="w-5 h-5" /> Admin Dashboard
                                 </Link>
                             </>
                         )}
@@ -75,7 +88,7 @@ export default function HomePage() {
                 <div className="mt-24 grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                     {/* Problem */}
                     <div className="card p-10 border-2 border-gray-100 bg-white rounded-2xl">
-                        <div className="text-5xl mb-6">⚠️</div>
+                        <div className="text-5xl mb-6 text-amber-500"><AlertTriangle className="w-12 h-12" /></div>
                         <h2 className="text-3xl font-bold text-gray-900 mb-5">The Problem</h2>
                         <p className="text-gray-600 leading-relaxed text-lg">
                             Mess halls waste tons of food daily due to poor demand forecasting,
@@ -86,7 +99,7 @@ export default function HomePage() {
 
                     {/* Solution */}
                     <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-10 shadow-xl hover:shadow-2xl transition-shadow text-white border-2 border-primary-500">
-                        <div className="text-5xl mb-6">✨</div>
+                        <div className="text-5xl mb-6"><Sparkles className="w-12 h-12" /></div>
                         <h2 className="text-3xl font-bold mb-5">Our Solution</h2>
                         <p className="leading-relaxed text-lg opacity-95">
                             ZeroPlate uses AI-powered analytics to collect real-time student feedback,
@@ -101,32 +114,32 @@ export default function HomePage() {
                     <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">Why ZeroPlate?</h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <FeatureCard
-                            icon="📊"
+                            icon={<BarChart3 className="w-10 h-10 text-primary-600" />}
                             title="Real-time Analytics"
                             description="Track ratings, sentiment, and waste patterns instantly"
                         />
                         <FeatureCard
-                            icon="🤖"
+                            icon={<Bot className="w-10 h-10 text-primary-600" />}
                             title="AI Insights"
                             description="Get smart recommendations powered by Gemini AI"
                         />
                         <FeatureCard
-                            icon="📱"
+                            icon={<Smartphone className="w-10 h-10 text-primary-600" />}
                             title="Easy Feedback"
                             description="Students submit feedback in seconds with emoji ratings"
                         />
                         <FeatureCard
-                            icon="📉"
+                            icon={<TrendingDown className="w-10 h-10 text-primary-600" />}
                             title="Waste Reduction"
                             description="Optimize portions based on actual consumption data"
                         />
                         <FeatureCard
-                            icon="💰"
+                            icon={<PiggyBank className="w-10 h-10 text-primary-600" />}
                             title="Cost Savings"
                             description="Reduce food costs by eliminating overproduction"
                         />
                         <FeatureCard
-                            icon="🌱"
+                            icon={<Leaf className="w-10 h-10 text-primary-600" />}
                             title="Sustainability"
                             description="Contribute to environmental conservation efforts"
                         />
@@ -145,10 +158,10 @@ export default function HomePage() {
     )
 }
 
-function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+function FeatureCard({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
     return (
         <div className="bg-white p-8 border border-gray-100 group hover:border-primary-200 transition-all rounded-2xl shadow-sm">
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{icon}</div>
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform flex items-center">{icon}</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
             <p className="text-gray-600 leading-relaxed">{description}</p>
         </div>

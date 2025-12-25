@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { UtensilsCrossed, GraduationCap, Briefcase, AlertTriangle, Sparkles } from 'lucide-react'
 import { signUpUser, UserRole, signInWithGoogle } from '@/lib/auth'
 
 export default function SignupPage() {
@@ -75,7 +76,7 @@ export default function SignupPage() {
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-4">
                         <div className="bg-primary-100 rounded-3xl p-6">
-                            <span className="text-6xl">🍽️</span>
+                            <UtensilsCrossed className="w-14 h-14 text-primary-600" />
                         </div>
                     </div>
                     <h2 className="text-4xl font-bold text-gray-900 mb-2">Join ZeroPlate</h2>
@@ -151,7 +152,7 @@ export default function SignupPage() {
                                         : 'border-gray-200 hover:border-primary-400'
                                         }`}
                                 >
-                                    <div className="text-4xl mb-2">🎓</div>
+                                    <div className="text-4xl mb-2 text-primary-600 flex justify-center"><GraduationCap className="w-8 h-8" /></div>
                                     <div className="text-sm font-semibold text-gray-900">Student</div>
                                 </button>
                                 <button
@@ -162,7 +163,7 @@ export default function SignupPage() {
                                         : 'border-gray-200 hover:border-primary-400'
                                         }`}
                                 >
-                                    <div className="text-4xl mb-2">👨‍💼</div>
+                                    <div className="text-4xl mb-2 text-primary-600 flex justify-center"><Briefcase className="w-8 h-8" /></div>
                                     <div className="text-sm font-semibold text-gray-900">Admin</div>
                                 </button>
                             </div>
@@ -170,8 +171,8 @@ export default function SignupPage() {
 
                         {/* Error Message */}
                         {error && (
-                            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl">
-                                <p className="text-red-700 text-sm font-medium">⚠️ {error}</p>
+                            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl flex items-center gap-2 text-sm text-red-700 font-medium">
+                                <AlertTriangle className="w-5 h-5" /> {error}
                             </div>
                         )}
 
@@ -181,7 +182,7 @@ export default function SignupPage() {
                             disabled={loading}
                             className="btn-primary w-full py-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Creating account...' : '✨ Create Account'}
+                            {loading ? 'Creating account...' : <span className="flex items-center justify-center gap-2"><Sparkles className="w-5 h-5" /> Create Account</span>}
                         </button>
                     </form>
 

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { UtensilsCrossed, Lock, AlertTriangle } from 'lucide-react'
 import { signInUser, signInWithGoogle } from '@/lib/auth'
 
 export default function LoginPage() {
@@ -65,7 +66,7 @@ export default function LoginPage() {
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-4">
                         <div className="bg-primary-100 rounded-3xl p-6">
-                            <span className="text-6xl">🍽️</span>
+                            <UtensilsCrossed className="w-14 h-14 text-primary-600" />
                         </div>
                     </div>
                     <h2 className="text-4xl font-bold text-gray-900 mb-2">Welcome to ZeroPlate</h2>
@@ -112,8 +113,8 @@ export default function LoginPage() {
 
                         {/* Error Message */}
                         {error && (
-                            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl">
-                                <p className="text-red-700 text-sm font-medium">⚠️ {error}</p>
+                            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl flex items-center gap-2 text-sm text-red-700 font-medium">
+                                <AlertTriangle className="w-5 h-5" /> {error}
                             </div>
                         )}
 
@@ -132,7 +133,7 @@ export default function LoginPage() {
                                     Processing...
                                 </span>
                             ) : (
-                                '🔐 Sign In'
+                                <span className="flex items-center justify-center gap-2"><Lock className="w-5 h-5" /> Sign In</span>
                             )}
                         </button>
                     </form>

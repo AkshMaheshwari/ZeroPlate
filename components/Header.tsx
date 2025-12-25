@@ -3,7 +3,15 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { HandHeartIcon } from 'lucide-react'
+import {
+    HandHeartIcon,
+    UtensilsCrossed,
+    GraduationCap,
+    Briefcase,
+    Menu,
+    X,
+    LogOut,
+} from 'lucide-react'
 import { onAuthChange, signOut, getCurrentUserData, UserData } from '@/lib/auth'
 
 export default function Header() {
@@ -46,7 +54,6 @@ export default function Header() {
             : [
                 { href: '/', label: 'Home' },
                 { href: '/feedback', label: 'Give Feedback' },
-                { href: '/donate-food', label: 'Donate Food', icon: HandHeartIcon },
             ]
         : [
             { href: '/', label: 'Home' },
@@ -60,7 +67,7 @@ export default function Header() {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="text-2xl">🍽️</span>
+                        <UtensilsCrossed className="w-6 h-6 text-primary-600" />
                         <span className="text-xl font-bold text-primary-600">ZeroPlate</span>
                     </Link>
 
@@ -90,20 +97,24 @@ export default function Header() {
                                     <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
                                         {userData.email[0].toUpperCase()}
                                     </div>
-                                    <span>{userData.role === 'admin' ? '👨‍💼' : '🎓'}</span>
+                                    {userData.role === 'admin' ? (
+                                        <Briefcase className="w-5 h-5 text-gray-700" />
+                                    ) : (
+                                        <GraduationCap className="w-5 h-5 text-gray-700" />
+                                    )}
                                 </button>
 
                                 {userMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                                        <div className="px-4 py-2 border-b border-gray-200">
-                                            <p className="text-sm font-semibold text-gray-900">{userData.email}</p>
+                                    <div className="absolute right-0 mt-2 w-64 max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-2 overflow-hidden">
+                                        <div className="px-4 py-2 border-b border-gray-200 space-y-1">
+                                            <p className="text-sm font-semibold text-gray-900 break-all leading-tight">{userData.email}</p>
                                             <p className="text-xs text-gray-600 capitalize">{userData.role}</p>
                                         </div>
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                         >
-                                            Sign Out
+                                            <LogOut className="w-4 h-4" /> Sign Out
                                         </button>
                                     </div>
                                 )}
@@ -122,22 +133,9 @@ export default function Header() {
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+                        aria-label="Toggle navigation"
                     >
-                        <svg
-                            className="h-6 w-6"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            {mobileMenuOpen ? (
-                                <path d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
+                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>
 

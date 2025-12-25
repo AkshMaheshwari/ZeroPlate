@@ -185,7 +185,7 @@ export default function WastageStats() {
 
                 {/* Daily Meal Breakdown */}
                 <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 border-2 border-green-100">
-                    <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><span>🍽️</span> Today's Progress</h4>
+                    <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><span>🍽️</span> Today&apos;s Progress</h4>
                     <div className="space-y-5">
                         <MealProgress label="Breakfast" val={mealTypeBreakdown.Breakfast} total={todayTotal} color="orange" icon="☀️" />
                         <MealProgress label="Lunch" val={mealTypeBreakdown.Lunch} total={todayTotal} color="yellow" icon="🌞" />

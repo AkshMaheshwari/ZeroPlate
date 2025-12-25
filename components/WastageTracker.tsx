@@ -251,7 +251,7 @@ export default function WastageTracker() {
 
             <div>
                 <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span>📋</span> Today's Entries
+                    <span>📋</span> Today&apos;s Entries
                 </h4>
 
                 {loading ? (

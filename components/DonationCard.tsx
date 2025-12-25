@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Package, UtensilsCrossed, Phone, Mail } from 'lucide-react'
+import { Check, Package, UtensilsCrossed, Phone, Mail, PenSquare, Clock4 } from 'lucide-react'
 import { NGO } from '@/lib/ngo'
 
 interface DonationCardProps {
@@ -121,7 +121,7 @@ export default function DonationCard({ ngo, onClose, onSubmit }: DonationCardPro
                         onChange={(e) =>
                             setFormData({ ...formData, quantity: parseFloat(e.target.value) || 0 })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 placeholder:text-gray-500 bg-white"
                         required
                     />
                     <p className="text-xs text-gray-600 mt-1">
@@ -137,7 +137,7 @@ export default function DonationCard({ ngo, onClose, onSubmit }: DonationCardPro
                     <select
                         value={formData.foodType}
                         onChange={(e) => setFormData({ ...formData, foodType: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 bg-white"
                         required
                     >
                         {FOOD_TYPES.map((type) => (
@@ -150,28 +150,28 @@ export default function DonationCard({ ngo, onClose, onSubmit }: DonationCardPro
 
                 {/* Description */}
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        📝 Description (optional)
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <PenSquare className="w-4 h-4" /> Description (optional)
                     </label>
                     <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         placeholder="e.g., Fresh cooked meals from today's lunch"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500 bg-white"
                         rows={3}
                     ></textarea>
                 </div>
 
                 {/* Pickup Time */}
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        ⏰ Preferred Pickup Time
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Clock4 className="w-4 h-4" /> Preferred Pickup Time
                     </label>
                     <input
                         type="datetime-local"
                         value={formData.pickupTime}
                         onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 placeholder:text-gray-500 bg-white"
                         required
                     />
                     <p className="text-xs text-gray-600 mt-1">Response time: {ngo.responseTime}m</p>
