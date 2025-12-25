@@ -85,6 +85,12 @@ export async function getUserLocation(): Promise<{
     lat: number;
     lon: number;
 } | null> {
+    // Check if running in browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+        // Default to New Delhi for SSR/demo
+        return { lat: 28.6139, lon: 77.209 };
+    }
+
     return new Promise((resolve) => {
         if (!navigator.geolocation) {
             console.warn('Geolocation not supported');

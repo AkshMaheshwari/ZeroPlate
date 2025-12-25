@@ -1,4 +1,6 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -13,6 +15,7 @@ import ImpactMetricsComponent from '@/components/ImpactMetrics'
 
 export default function DonateFoodPage() {
     const router = useRouter()
+    const [mounted, setMounted] = useState(false)
     const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null)
     const [filteredNGOs, setFilteredNGOs] = useState<(NGO & { distance?: number })[]>([])
     const [selectedNGO, setSelectedNGO] = useState<NGO | null>(null)
@@ -26,8 +29,15 @@ export default function DonateFoodPage() {
     const [minCapacity, setMinCapacity] = useState(0)
     const [activeTab, setActiveTab] = useState<'list' | 'impact'>('list')
 
+    // Client-side mount check
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
     // Auth check
     useEffect(() => {
+        if (!mounted) return
+        
         const unsubscribe = onAuthChange((user) => {
             if (!user) {
                 router.push('/login')
@@ -36,10 +46,12 @@ export default function DonateFoodPage() {
             }
         })
         return () => unsubscribe()
-    }, [router])
+    }, [router, mounted])
 
     // Get user location and filter NGOs
     useEffect(() => {
+        if (!mounted || !userAuthenticated) return
+        
         const initializeLocation = async () => {
             // Get user location
             const location = await getUserLocation()
@@ -66,10 +78,8 @@ export default function DonateFoodPage() {
             setLoading(false)
         }
 
-        if (userAuthenticated) {
-            initializeLocation()
-        }
-    }, [userAuthenticated])
+        initializeLocation()
+    }, [userAuthenticated, mounted])
 
     // Apply filters
     const applyFilters = (
@@ -139,7 +149,7 @@ export default function DonateFoodPage() {
         'vegetables',
     ]
 
-    if (!userAuthenticated || loading) {
+    if (!mounted || !userAuthenticated || loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
