@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { HandHeartIcon } from 'lucide-react'
 import { onAuthChange, signOut, getCurrentUserData, UserData } from '@/lib/auth'
 
 export default function Header() {
@@ -40,10 +41,12 @@ export default function Header() {
             ? [
                 { href: '/', label: 'Home' },
                 { href: '/dashboard', label: 'Dashboard' },
+                { href: '/donate-food', label: 'Donate Food', icon: HandHeartIcon },
             ]
             : [
                 { href: '/', label: 'Home' },
                 { href: '/feedback', label: 'Give Feedback' },
+                { href: '/donate-food', label: 'Donate Food', icon: HandHeartIcon },
             ]
         : [
             { href: '/', label: 'Home' },
@@ -67,11 +70,12 @@ export default function Header() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === link.href
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${pathname === link.href
                                         ? 'text-primary-600 bg-primary-50'
                                         : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
                                     }`}
                             >
+                                {link.icon && <link.icon className="w-4 h-4" />}
                                 {link.label}
                             </Link>
                         ))}

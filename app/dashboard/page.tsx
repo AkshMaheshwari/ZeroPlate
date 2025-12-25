@@ -12,6 +12,7 @@ import AIInsights from '@/components/AIInsights'
 import FeedbackTable from '@/components/FeedbackTable'
 import WastageTracker from '@/components/WastageTracker'
 import WastageStats from '@/components/WastageStats'
+import NGODonationWidget from '@/components/NGODonationWidget'
 
 export default function DashboardPage() {
     const router = useRouter()
@@ -165,6 +166,11 @@ export default function DashboardPage() {
                 <div className="mt-12 grid lg:grid-cols-2 gap-8">
                     <WastageTracker />
                     <WastageStats />
+                </div>
+
+                {/* NGO Donation Section */}
+                <div className="mt-12">
+                    <NGODonationWidget />
                 </div>
 
                 {/* AI Insights */}

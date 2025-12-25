@@ -29,6 +29,9 @@ ZeroPlate collects real-time student feedback, analyzes meal preferences, and pr
 - **📉 Waste Reduction**: Optimize portions based on actual consumption data
 - **💰 Cost Savings**: Reduce food costs by eliminating overproduction
 - **🌱 Sustainability**: Contribute to environmental conservation
+- **🤝 NGO Donations**: Connect with nearby NGOs to donate excess food and reduce waste
+- **📍 NGO Locator**: Find NGOs by distance, capacity, and food preferences
+- **📊 Impact Dashboard**: Track environmental impact, meals fed, and CO2 saved
 
 ## 🛠️ Tech Stack
 
@@ -46,6 +49,7 @@ ZeroPlate/
 │   ├── page.tsx                 # Landing page
 │   ├── feedback/page.tsx        # Student feedback form
 │   ├── dashboard/page.tsx       # Admin dashboard
+│   ├── donate-food/page.tsx     # NGO donation locator
 │   ├── layout.tsx               # Root layout
 │   └── globals.css              # Global styles
 ├── components/
@@ -53,11 +57,19 @@ ZeroPlate/
 │   ├── OverviewCards.tsx        # Dashboard metrics cards
 │   ├── AIInsights.tsx           # AI recommendations
 │   ├── FeedbackTable.tsx        # Recent feedback table
+│   ├── NearbyNGOs.tsx           # NGO list with filters
+│   ├── NGOLocatorMap.tsx        # Map visualization
+│   ├── DonationCard.tsx         # Donation form
+│   ├── ImpactMetrics.tsx        # Impact dashboard
+│   ├── NGODonationWidget.tsx    # Dashboard NGO widget
 │   └── charts/
 │       ├── RatingsChart.tsx     # Ratings over time
 │       └── SentimentChart.tsx   # Sentiment pie chart
 ├── lib/
-│   └── firebase.ts              # Firebase configuration
+│   ├── firebase.ts              # Firebase configuration
+│   ├── auth.ts                  # Authentication helpers
+│   ├── ngo.ts                   # NGO data model & mock data
+│   └── location.ts              # Location & distance utilities
 └── package.json
 ```
 
