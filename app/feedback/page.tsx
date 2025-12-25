@@ -195,7 +195,7 @@ export default function FeedbackPage() {
                                     </p>
                                     {transcript && (
                                         <p className="mt-2 text-xs text-gray-500 italic px-4 leading-relaxed">
-                                            "{transcript}"
+                                            {transcript}
                                         </p>
                                     )}
                                 </div>
