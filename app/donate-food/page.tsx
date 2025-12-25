@@ -1,10 +1,9 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Package, UtensilsCrossed, TrendingUp, Map, List } from 'lucide-react'
+import { MapPin, Package, UtensilsCrossed, TrendingUp, Map, List, Search } from 'lucide-react'
 import { onAuthChange } from '@/lib/auth'
 import { MOCK_NGOS, NGO } from '@/lib/ngo'
 import { getUserLocation, filterAndSortNGOs, FilterCriteria } from '@/lib/location'
@@ -23,109 +22,53 @@ export default function DonateFoodPage() {
     const [loading, setLoading] = useState(true)
     const [userAuthenticated, setUserAuthenticated] = useState(false)
 
-    // Filter states
     const [maxDistance, setMaxDistance] = useState(20)
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [minCapacity, setMinCapacity] = useState(0)
     const [activeTab, setActiveTab] = useState<'list' | 'impact'>('list')
 
-    // Client-side mount check
-    useEffect(() => {
-        setMounted(true)
-    }, [])
+    useEffect(() => { setMounted(true) }, [])
 
-    // Auth check
     useEffect(() => {
         if (!mounted) return
-        
         const unsubscribe = onAuthChange((user) => {
-            if (!user) {
-                router.push('/login')
-            } else {
-                setUserAuthenticated(true)
-            }
+            if (!user) router.push('/login')
+            else setUserAuthenticated(true)
         })
         return () => unsubscribe()
     }, [router, mounted])
 
-    // Get user location and filter NGOs
     useEffect(() => {
         if (!mounted || !userAuthenticated) return
-        
         const initializeLocation = async () => {
-            // Get user location
             const location = await getUserLocation()
             setUserLocation(location)
-            console.log('User location:', location)
-            console.log('Mock NGOs count:', MOCK_NGOS.length)
-
-            // Show all NGOs initially with distance calculations
             if (location) {
                 const ngosByDistance = MOCK_NGOS.map((ngo) => {
-                    const dist = Math.sqrt(
-                        Math.pow(ngo.latitude - location.lat, 2) +
-                        Math.pow(ngo.longitude - location.lon, 2)
-                    ) * 111; // Rough conversion to km
+                    const dist = Math.sqrt(Math.pow(ngo.latitude - location.lat, 2) + Math.pow(ngo.longitude - location.lon, 2)) * 111;
                     return { ...ngo, distance: dist }
                 }).sort((a, b) => (a.distance || 0) - (b.distance || 0))
-                
-                console.log('NGOs with distances:', ngosByDistance)
                 setFilteredNGOs(ngosByDistance)
             } else {
-                // Fallback: show all NGOs without distance
                 setFilteredNGOs(MOCK_NGOS as any)
             }
             setLoading(false)
         }
-
         initializeLocation()
     }, [userAuthenticated, mounted])
 
-    // Apply filters
-    const applyFilters = (
-        location: { lat: number; lon: number },
-        criteria: FilterCriteria
-    ) => {
-        const filtered = filterAndSortNGOs(MOCK_NGOS, location, {
-            ...criteria,
-            onlyActive: true,
-        })
-        setFilteredNGOs(filtered)
-    }
-
     const handleFilterChange = () => {
         if (userLocation) {
-            // Filter NGOs based on criteria
             let filtered = MOCK_NGOS.map((ngo) => {
-                const dist = Math.sqrt(
-                    Math.pow(ngo.latitude - userLocation.lat, 2) +
-                    Math.pow(ngo.longitude - userLocation.lon, 2)
-                ) * 111; // Rough conversion to km
+                const dist = Math.sqrt(Math.pow(ngo.latitude - userLocation.lat, 2) + Math.pow(ngo.longitude - userLocation.lon, 2)) * 111;
                 return { ...ngo, distance: dist }
             })
-
-            // Apply distance filter
             filtered = filtered.filter((ngo) => (ngo.distance || 0) <= maxDistance)
-
-            // Apply capacity filter
-            filtered = filtered.filter(
-                (ngo) => ngo.capacity - ngo.currentLoad >= minCapacity
-            )
-
-            // Apply food category filter
+            filtered = filtered.filter((ngo) => ngo.capacity - ngo.currentLoad >= minCapacity)
             if (selectedCategories.length > 0) {
-                filtered = filtered.filter((ngo) =>
-                    selectedCategories.some((cat) =>
-                        ngo.foodCategories.includes(cat)
-                    )
-                )
+                filtered = filtered.filter((ngo) => selectedCategories.some((cat) => ngo.foodCategories.includes(cat)))
             }
-
-            // Sort by distance
-            filtered = filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0))
-
-            console.log('Filtered result:', filtered.length, 'NGOs')
-            setFilteredNGOs(filtered)
+            setFilteredNGOs(filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0)))
         }
     }
 
@@ -134,193 +77,131 @@ export default function DonateFoodPage() {
         setShowDonationCard(true)
     }
 
-    const handleDonationSubmit = async (data: any) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-        console.log('Donation submitted:', data)
-        // In real app, save to Firestore
-    }
-
-    const allFoodCategories = [
-        'cooked',
-        'raw',
-        'packaged',
-        'fruits',
-        'vegetables',
-    ]
+    const allFoodCategories = ['cooked', 'raw', 'packaged', 'fruits', 'vegetables']
 
     if (!mounted || !userAuthenticated || loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="mb-4"><TrendingUp className="w-12 h-12 animate-spin text-primary-600 mx-auto" /></div>
-                    <p className="text-gray-600">Loading nearby NGOs...</p>
-                </div>
-            </div>
-        )
+        return <div className="min-h-screen bg-white flex items-center justify-center"><div className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-green-50">
+        <div className="relative min-h-screen bg-[#f1f5f9] overflow-x-hidden">
+            {/* --- DOODLE BACKGROUND --- */}
+            <div className="absolute inset-0 z-0 opacity-[0.12] pointer-events-none select-none">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <pattern id="heavy-doodle" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+                        <path d="M40 40 L70 40 L55 70 Z" stroke="#059669" strokeWidth="3" fill="none" />
+                        <path d="M120 50 q15 -20 30 0 v10 h-30 Z" stroke="#0f172a" strokeWidth="3" fill="none"/>
+                        <path d="M40 120 h25 v20 q0 8 -8 8 h-9 q-8 0 -8 -8 Z" stroke="#0f172a" strokeWidth="3" fill="none" />
+                        <path d="M130 120 l20 20 M150 120 l-20 20" stroke="#059669" strokeWidth="3" />
+                        <circle cx="90" cy="90" r="3" fill="#059669"/>
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#heavy-doodle)" />
+                </svg>
+            </div>
+
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary-600 to-green-600 text-white py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">Connect with NGOs</h1>
-                    <p className="text-lg text-white/90">
-                        Donate excess food to nearby NGOs and make a difference
-                    </p>
+            <div className="relative z-10 py-12 px-4">
+                <div className="max-w-7xl mx-auto text-center">
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase mb-4">
+                        Find <span className="text-emerald-600">NGOs</span> Nearby
+                    </h1>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Make an impact with your surplus food</p>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Tabs */}
-                <div className="flex gap-4 mb-8 border-b border-gray-200">
-                    <button
-                        onClick={() => setActiveTab('list')}
-                        className={`px-6 py-3 font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                            activeTab === 'list'
-                                ? 'border-primary-600 text-primary-600'
-                                : 'border-transparent text-gray-600 hover:text-gray-900'
-                        }`}
-                    >
-                        <Map className="w-5 h-5" />Find NGOs
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('impact')}
-                        className={`px-6 py-3 font-semibold border-b-2 transition-all flex items-center gap-2 ${
-                            activeTab === 'impact'
-                                ? 'border-primary-600 text-primary-600'
-                                : 'border-transparent text-gray-600 hover:text-gray-900'
-                        }`}
-                    >
-                        <TrendingUp className="w-5 h-5" />Impact Metrics
-                    </button>
+            <div className="relative z-10 max-w-7xl mx-auto px-4 pb-20">
+                {/* Custom Tabs */}
+                <div className="flex justify-center gap-2 mb-10">
+                    {[ { id: 'list', label: 'Find NGOs', icon: Map }, { id: 'impact', label: 'Our Impact', icon: TrendingUp } ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-2 border-2 ${
+                                activeTab === tab.id 
+                                ? 'bg-slate-900 text-white border-slate-900 shadow-xl shadow-slate-200' 
+                                : 'bg-white text-slate-400 border-white hover:border-slate-200'
+                            }`}
+                        >
+                            <tab.icon className="w-4 h-4" /> {tab.label}
+                        </button>
+                    ))}
                 </div>
 
-                {/* List Tab */}
                 {activeTab === 'list' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                        {/* Sidebar - Filters */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Sidebar - Bento Style Filters */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-4">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">🔍 Filters</h3>
-
-                                {/* Distance Filter */}
-                                <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                        <MapPin className="w-4 h-4" />Distance: {maxDistance}km
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="50"
-                                        value={maxDistance}
-                                        onChange={(e) => {
-                                            setMaxDistance(parseInt(e.target.value))
-                                            handleFilterChange()
-                                        }}
-                                        className="w-full"
-                                    />
+                            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-white sticky top-8">
+                                <div className="flex items-center gap-2 mb-8">
+                                    <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600"><Search className="w-4 h-4" /></div>
+                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Filters</h3>
                                 </div>
 
-                                {/* Capacity Filter */}
-                                <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                        <Package className="w-4 h-4" />Min Available: {minCapacity}kg
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="500"
-                                        step="50"
-                                        value={minCapacity}
-                                        onChange={(e) => {
-                                            setMinCapacity(parseInt(e.target.value))
-                                            handleFilterChange()
-                                        }}
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                {/* Food Categories */}
-                                <div className="mb-6">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                        <UtensilsCrossed className="w-4 h-4" />Food Types
-                                    </label>
-                                    <div className="space-y-2">
-                                        {allFoodCategories.map((category) => (
-                                            <label key={category} className="flex items-center gap-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedCategories.includes(category)}
-                                                    onChange={(e) => {
-                                                        const newCategories = e.target.checked
-                                                            ? [...selectedCategories, category]
-                                                            : selectedCategories.filter((c) => c !== category)
-                                                        setSelectedCategories(newCategories)
-                                                    }}
-                                                    className="rounded"
-                                                />
-                                                <span className="text-sm text-gray-700 capitalize">
-                                                    {category}
-                                                </span>
-                                            </label>
-                                        ))}
+                                <div className="space-y-8">
+                                    {/* Distance */}
+                                    <div className="space-y-3">
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Radius: {maxDistance}km</label>
+                                        <input type="range" min="1" max="50" value={maxDistance} onChange={(e) => { setMaxDistance(parseInt(e.target.value)); handleFilterChange(); }} className="w-full accent-emerald-500" />
                                     </div>
-                                </div>
 
-                                {/* Apply Button */}
-                                <button
-                                    onClick={handleFilterChange}
-                                    className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 rounded-lg transition-colors"
-                                >
-                                    Apply Filters
-                                </button>
+                                    {/* Capacity */}
+                                    <div className="space-y-3">
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Min Capacity: {minCapacity}kg</label>
+                                        <input type="range" min="0" max="500" step="50" value={minCapacity} onChange={(e) => { setMinCapacity(parseInt(e.target.value)); handleFilterChange(); }} className="w-full accent-emerald-500" />
+                                    </div>
 
-                                {/* Stats */}
-                                <div className="mt-6 pt-6 border-t border-gray-200">
-                                    <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"><TrendingUp className="w-4 h-4" />Found:</p>
-                                    <p className="text-2xl font-bold text-primary-600">
-                                        {filteredNGOs.length}
-                                    </p>
-                                    <p className="text-xs text-gray-600">NGOs nearby</p>
+                                    {/* Food Categories */}
+                                    <div className="space-y-3">
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Food Types</label>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {allFoodCategories.map((cat) => (
+                                                <label key={cat} className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer ${selectedCategories.includes(cat) ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-50 bg-slate-50 text-slate-400'}`}>
+                                                    <input type="checkbox" className="hidden" checked={selectedCategories.includes(cat)} onChange={(e) => {
+                                                        const newCats = e.target.checked ? [...selectedCategories, cat] : selectedCategories.filter(c => c !== cat);
+                                                        setSelectedCategories(newCats); handleFilterChange();
+                                                    }} />
+                                                    <span className="text-[10px] font-black uppercase tracking-tight">{cat}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="pt-6 border-t border-slate-100">
+                                        <div className="bg-slate-900 rounded-2xl p-4 text-center">
+                                            <p className="text-white text-2xl font-black">{filteredNGOs.length}</p>
+                                            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">NGOs Found</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Main Content */}
-                        <div className="lg:col-span-3 space-y-6">
-                            {/* Map - Hidden when form is shown */}
+                        {/* Main Section */}
+                        <div className="lg:col-span-3 space-y-8">
                             {!showDonationCard && (
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><Map className="w-6 h-6" />Interactive Map</h3>
-                                    <InteractiveMap
-                                        ngos={filteredNGOs}
-                                        userLocation={userLocation || undefined}
-                                        onSelectNGO={handleSelectNGO}
-                                        selectedNGO={selectedNGO}
+                                <div className="bg-white p-4 rounded-[2.5rem] shadow-xl border border-white overflow-hidden h-[400px]">
+                                    <InteractiveMap 
+                                        ngos={filteredNGOs} 
+                                        userLocation={userLocation || undefined} 
+                                        onSelectNGO={handleSelectNGO} 
+                                        selectedNGO={selectedNGO} 
                                     />
                                 </div>
                             )}
 
-                            {/* NGO List */}
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <List className="w-6 h-6" />Nearby NGOs ({filteredNGOs.length})
+                            <div className="space-y-6">
+                                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight ml-4 flex items-center gap-2">
+                                    <div className="w-2 h-6 bg-emerald-500 rounded-full"></div> Nearby Partners
                                 </h3>
-                                <NearbyNGOs
-                                    ngos={filteredNGOs}
-                                    onSelectNGO={handleSelectNGO}
-                                />
+                                <NearbyNGOs ngos={filteredNGOs} onSelectNGO={handleSelectNGO} />
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Impact Tab */}
                 {activeTab === 'impact' && (
-                    <div>
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-white">
                         <ImpactMetricsComponent loading={false} />
                     </div>
                 )}
@@ -328,15 +209,17 @@ export default function DonateFoodPage() {
 
             {/* Donation Modal */}
             {showDonationCard && selectedNGO && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <DonationCard
-                        ngo={selectedNGO}
-                        onClose={() => {
-                            setShowDonationCard(false)
-                            setSelectedNGO(null)
-                        }}
-                        onSubmit={handleDonationSubmit}
-                    />
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden border-4 border-white">
+                        <DonationCard
+                            ngo={selectedNGO}
+                            onClose={() => { setShowDonationCard(false); setSelectedNGO(null); }}
+                            onSubmit={async (data) => {
+                                await new Promise(r => setTimeout(r, 1500));
+                                setShowDonationCard(false);
+                            }}
+                        />
+                    </div>
                 </div>
             )}
         </div>
