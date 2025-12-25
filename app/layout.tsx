@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,11 +19,14 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                {/* Header is global - shows on Home, Feedback, and Dashboard */}
                 <Header />
                 <main className="min-h-screen bg-gray-50">
                     {children}
                 </main>
+                {/* Initializing GA4 using your ENV variable */}
+                {process.env.NEXT_PUBLIC_GA_ID && (
+                    <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+                )}
             </body>
         </html>
     )
