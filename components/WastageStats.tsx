@@ -171,7 +171,7 @@ export default function WastageStats() {
                 <div className="bg-emerald-900 rounded-[2rem] p-8 text-white shadow-xl shadow-emerald-100 relative overflow-hidden">
                     <Target className="absolute -right-10 -bottom-10 w-40 h-40 opacity-5" />
                     <h4 className="font-black uppercase text-xs tracking-widest mb-8 flex items-center gap-2 relative z-10">
-                        <PieChart className="w-4 h-4 text-emerald-400" /> Today's Distribution
+                        <PieChart className="w-4 h-4 text-emerald-400" /> Today&apos;s Distribution
                     </h4>
                     
                     <div className="space-y-6 relative z-10">
