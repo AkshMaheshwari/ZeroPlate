@@ -30,7 +30,7 @@ const model = genAI.getGenerativeModel({
 
 // ---- ROUTE ----
 app.get("/",(req, res) =>{
-  res.send("Welcome to ZeroPlate AI Backend");
+  res.send("Welcome to ZeroPlate AI Backend!");
 })
 app.post("/analyze-waste", analyzeLimiter, async (req, res) => {
   const { feedbackData, wastageData } = req.body;
