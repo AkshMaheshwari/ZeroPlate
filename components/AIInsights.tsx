@@ -68,7 +68,7 @@ export default function AllInsights() {
             }
 
             // 3. Send to your Node.js backend (index.js)
-            const res = await axios.post("http://localhost:3001/analyze-waste", {
+            const res = await axios.post("https://zeroplate.onrender.com/analyze-waste", {
                 feedbackData: feedbackData,
                 wastageData: wastageData
             });
