@@ -19,66 +19,74 @@ const analyzeLimiter = rateLimit({
   }
 });
 
-// ---- GEMINI SETUP (single instance) ----
+// ---- GEMINI SETUP ----
 const geminiapikey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(geminiapikey);
 
-// IMPORTANT: reuse model (do NOT create inside route)
+// Reusing model instance for better performance
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash"
+  model: "gemini-2.5-flash" // Using stable 2.5 flash or your preferred version
 });
 
 // ---- ROUTE ----
 app.post("/analyze-waste", analyzeLimiter, async (req, res) => {
   const { feedbackData, wastageData } = req.body;
 
+  // UPDATED PROMPT: Now explicitly instructs AI to look at verbal feedback (transcripts)
   const prompt = `
-You are a food waste reduction AI analyzing cafeteria data.
+You are a food waste reduction AI for a university cafeteria. 
 
-FEEDBACK DATA: ${JSON.stringify(feedbackData || [])}
-WASTAGE DATA: ${JSON.stringify(wastageData || [])}
+DATA TO ANALYZE:
+1. FEEDBACK & VOICE TRANSCRIPTS: ${JSON.stringify(feedbackData || [])}
+2. PHYSICAL WASTAGE DATA: ${JSON.stringify(wastageData || [])}
 
-Analyze the data and identify:
-1. Dishes with high wastage - suggest portion changes or recipe improvements
-2. Correlation between low ratings and high wastage
-3. Sentiment trends - which dishes get negative feedback
-4. Time patterns - which meals generate more waste
-5. Actionable recommendations to reduce waste by at least 20%
+INSTRUCTIONS:
+- Analyze student comments and voice transcripts (found in fields like 'transcript', 'comment', or 'content').
+- Look for specific verbal reasons for waste (e.g., "too salty", "rice was hard", "portion too big").
+- Identify:
+    1. Dishes with high wastage - suggest portion changes or recipe improvements.
+    2. Correlation between low ratings/negative voice feedback and high wastage.
+    3. Sentiment trends - which dishes get negative verbal feedback.
+    4. Actionable recommendations to reduce waste by at least 20%.
 
 Return ONLY a RAW JSON object (no markdown, no backticks) in this EXACT format:
 {
   "insights": [
     {
       "id": 1,
-      "suggestion": "Specific actionable recommendation",
-      "impact": "Expected reduction in waste or improvement",
+      "suggestion": "Specific actionable recommendation based on data or student voice",
+      "impact": "Expected reduction in waste or student satisfaction improvement",
       "priority": "High"
     }
   ]
 }
 
-Create 4-6 insights.
+Create 4-6 high-quality insights.
 `;
 
   try {
-    // ---- SIMPLE RETRY (1 attempt) ----
+    // SIMPLE RETRY logic
     let result;
     try {
       result = await model.generateContent(prompt);
-    } catch {
+    } catch (retryErr) {
+      console.log("Retrying Gemini request...");
       result = await model.generateContent(prompt);
     }
 
     const text = result.response.text().trim();
+    
+    // Clean potential markdown formatting from AI response
     const cleanJSON = text.replace(/```json|```/g, "").trim();
 
     res.json(JSON.parse(cleanJSON));
   } catch (err) {
     console.error("Gemini Error:", err.message);
-    res.status(500).json({ error: "AI failed or rate limit hit" });
+    res.status(500).json({ error: "AI analysis failed. Ensure your API key is valid and backend is receiving data." });
   }
 });
 
-app.listen(3001, () =>
-  console.log("🚀 Backend running at http://localhost:3001")
+const PORT = 3001;
+app.listen(PORT, () =>
+  console.log(`🚀 ZeroPlate AI Backend running at http://localhost:${PORT}`)
 );

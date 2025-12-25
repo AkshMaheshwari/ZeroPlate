@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -24,16 +24,26 @@ export default function AllInsights() {
 
     const getAIAnalysis = async () => {
         setLoading(true);
-        setError(null); // Clear previous errors
+        setError(null);
 
         try {
-            // Fetch feedback data
+            // 1. Fetch feedback data (Including the new transcript field)
             const feedbackRef = collection(db, "feedback");
-            const feedbackQuery = query(feedbackRef, orderBy("timestamp", "desc"), limit(10));
+            const feedbackQuery = query(feedbackRef, orderBy("timestamp", "desc"), limit(15));
             const feedbackSnap = await getDocs(feedbackQuery);
-            const feedbackData = feedbackSnap.docs.map(doc => doc.data());
+            
+            const feedbackData = feedbackSnap.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    dish: data.dishName,
+                    rating: data.rating,
+                    // ✅ CRITICAL: Pass the transcript to the AI backend
+                    transcript: data.transcript || "", 
+                    mealType: data.mealType || ""
+                };
+            });
 
-            // Fetch wastage data (last 7 days)
+            // 2. Fetch wastage data (last 7 days)
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
             const wastageRef = collection(db, "dailyWastage");
@@ -57,7 +67,7 @@ export default function AllInsights() {
                 return;
             }
 
-            // Ensure your backend (node index.js) is running on port 3001
+            // 3. Send to your Node.js backend (index.js)
             const res = await axios.post("http://localhost:3001/analyze-waste", {
                 feedbackData: feedbackData,
                 wastageData: wastageData
@@ -66,8 +76,7 @@ export default function AllInsights() {
             setSuggestions(res.data.insights || []);
         } catch (err: any) {
             console.error("Connection Error:", err);
-            // Fixed the red line by ensuring we only pass a string
-            setError("AI Server is offline. Please start the backend.");
+            setError("AI Server is offline. Please start the backend (node index.js).");
         } finally {
             setLoading(false);
         }
@@ -75,11 +84,19 @@ export default function AllInsights() {
 
     return (
         <div className="bg-[#1e1b4b] rounded-2xl p-6 text-white border border-indigo-500/30 shadow-2xl mt-6">
-            <div className="mb-6">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                    <span className="text-yellow-400">✨</span> AI Waste Analysis
-                </h3>
-                <p className="text-xs text-indigo-300">Live insights from recent feedback</p>
+            <div className="mb-6 flex justify-between items-center">
+                <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                        <span className="text-yellow-400">✨</span> AI Waste Analysis
+                    </h3>
+                    <p className="text-xs text-indigo-300">Analyzing voice feedback & wastage patterns</p>
+                </div>
+                <button 
+                    onClick={getAIAnalysis}
+                    className="text-xs bg-indigo-500/20 hover:bg-indigo-500/40 px-3 py-1 rounded-lg border border-indigo-500/50 transition-all"
+                >
+                    🔄 Refresh
+                </button>
             </div>
 
             <div className="space-y-4">
@@ -91,7 +108,7 @@ export default function AllInsights() {
                 ) : error ? (
                     <div className="text-center py-6 text-red-400 bg-red-900/20 rounded-xl border border-red-500/50">
                         <p className="text-sm font-medium">{error}</p>
-                        <p className="text-[10px] mt-1 opacity-70 italic">Check your terminal: cd server && node index.js</p>
+                        <p className="text-[10px] mt-1 opacity-70 italic">Check terminal: cd server && node index.js</p>
                     </div>
                 ) : suggestions.length > 0 ? (
                     suggestions.map((item, index) => (
@@ -101,8 +118,9 @@ export default function AllInsights() {
                         >
                             <div className="flex justify-between items-start">
                                 <p className="text-sm font-medium text-gray-100">{item.suggestion}</p>
-                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${item.priority === 'High' ? 'bg-red-900/40 text-red-400' : 'bg-blue-900/40 text-blue-400'
-                                    }`}>
+                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase ${
+                                    item.priority === 'High' ? 'bg-red-900/40 text-red-400' : 'bg-blue-900/40 text-blue-400'
+                                }`}>
                                     {item.priority}
                                 </span>
                             </div>
