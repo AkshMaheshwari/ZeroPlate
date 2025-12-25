@@ -62,10 +62,18 @@ export default function FeedbackPage() {
         setIsSubmitting(true)
         try {
             const selectedRating = EMOJI_RATINGS.find(r => r.value === rating);
+            
+            // This boolean tells your FeedbackTable to show the Mic icon
+            const hasVoiceNote = transcript.trim().length > 0;
+
             await addDoc(collection(db, 'feedback'), {
                 uid: currentUser?.uid,
                 email: currentUser?.email,
-                mealType, dishName, rating, transcript,
+                mealType, 
+                dishName, 
+                rating, 
+                transcript, // Still saving the text data in the background
+                hasVoiceNote, // The key for the Audio Icon to appear in the table
                 sentiment: selectedRating?.sentiment,
                 timestamp: serverTimestamp(),
             })
@@ -84,23 +92,14 @@ export default function FeedbackPage() {
             <div className="absolute inset-0 z-0 opacity-[0.15] pointer-events-none select-none">
                 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                     <pattern id="heavy-doodle" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
-                        {/* Pizza Slice */}
                         <path d="M40 40 L70 40 L55 70 Z" stroke="#059669" strokeWidth="3" fill="none" strokeLinejoin="round"/>
                         <circle cx="50" cy="48" r="2" fill="#059669"/>
                         <circle cx="60" cy="48" r="2" fill="#059669"/>
-                        
-                        {/* Burger/Bun */}
                         <path d="M120 50 q15 -20 30 0 v10 h-30 Z" stroke="#0f172a" strokeWidth="3" fill="none"/>
                         <path d="M120 65 h30" stroke="#0f172a" strokeWidth="3" />
-
-                        {/* Coffee Mug */}
                         <path d="M40 120 h25 v20 q0 8 -8 8 h-9 q-8 0 -8 -8 Z" stroke="#0f172a" strokeWidth="3" fill="none" />
                         <path d="M65 125 q5 0 5 5 t-5 5" stroke="#0f172a" strokeWidth="3" fill="none" />
-
-                        {/* Cutlery Cross */}
                         <path d="M130 120 l20 20 M150 120 l-20 20" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
-                        
-                        {/* Decorative Dots */}
                         <circle cx="90" cy="90" r="3" fill="#059669"/>
                         <circle cx="10" cy="150" r="3" fill="#0f172a"/>
                     </pattern>
@@ -111,7 +110,7 @@ export default function FeedbackPage() {
             <div className="relative z-10 w-full max-w-md">
                 <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-sm">
                     <div className="mb-8 text-center">
-                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">How was your meal?</h1>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">How was your meal?</h1>
                         <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest">Logged in as {currentUser?.email?.split('@')[0]}</p>
                     </div>
                     
