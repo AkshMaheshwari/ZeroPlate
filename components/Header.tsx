@@ -1,17 +1,8 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import {
-    HandHeartIcon,
-    UtensilsCrossed,
-    GraduationCap,
-    Briefcase,
-    Menu,
-    X,
-    LogOut,
-} from 'lucide-react'
+import { HandHeartIcon, UtensilsCrossed, GraduationCap, Briefcase, Menu, X, LogOut, ChevronDown } from 'lucide-react'
 import { onAuthChange, signOut, getCurrentUserData, UserData } from '@/lib/auth'
 
 export default function Header() {
@@ -22,7 +13,6 @@ export default function Header() {
     const [userMenuOpen, setUserMenuOpen] = useState(false)
 
     useEffect(() => {
-        // Listen for auth state changes
         const unsubscribe = onAuthChange(async (user) => {
             if (user) {
                 const data = await getCurrentUserData()
@@ -31,7 +21,6 @@ export default function Header() {
                 setUserData(null)
             }
         })
-
         return () => unsubscribe()
     }, [])
 
@@ -39,146 +28,65 @@ export default function Header() {
         try {
             await signOut()
             router.push('/login')
-        } catch (error) {
-            console.error('Sign out error:', error)
-        }
+        } catch (error) { console.error(error) }
     }
 
-    const navLinks = userData
-        ? userData.role === 'admin'
-            ? [
-                { href: '/', label: 'Home' },
-                { href: '/dashboard', label: 'Dashboard' },
-                { href: '/donate-food', label: 'Donate Food', icon: HandHeartIcon },
-            ]
-            : [
-                { href: '/', label: 'Home' },
-                { href: '/feedback', label: 'Give Feedback' },
-            ]
-        : [
-            { href: '/', label: 'Home' },
-            { href: '/feedback', label: 'Give Feedback' },
-            { href: '/dashboard', label: 'Dashboard' },
-        ]
+    const navLinks = userData?.role === 'admin' 
+        ? [{ href: '/', label: 'Home' }, { href: '/dashboard', label: 'Admin Panel' }, { href: '/donate-food', label: 'Donate', icon: HandHeartIcon }]
+        : [{ href: '/', label: 'Home' }, { href: '/feedback', label: 'Share Feedback' }];
 
     return (
-        <header className="bg-white shadow-sm sticky top-0 z-50">
+        <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
             <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2">
-                        <UtensilsCrossed className="w-6 h-6 text-primary-600" />
-                        <span className="text-xl font-bold text-primary-600">ZeroPlate</span>
+                <div className="flex justify-between items-center h-20">
+                    <Link href="/" className="flex items-center space-x-2 group">
+                        <div className="bg-emerald-600 p-2 rounded-xl group-hover:rotate-12 transition-transform">
+                            <UtensilsCrossed className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-2xl font-black tracking-tight text-gray-900">Zero<span className="text-emerald-600">Plate</span></span>
                     </Link>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center space-x-1">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${pathname === link.href
-                                        ? 'text-primary-600 bg-primary-50'
-                                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                                    }`}
+                                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${pathname === link.href ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600'}`}
                             >
-                                {link.icon && <link.icon className="w-4 h-4" />}
                                 {link.label}
                             </Link>
                         ))}
 
-                        {/* User Menu */}
+                        <div className="h-6 w-px bg-gray-200 mx-4" />
+
                         {userData ? (
                             <div className="relative">
-                                <button
-                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                >
-                                    <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full border border-gray-200 hover:shadow-md transition-shadow">
+                                    <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold">
                                         {userData.email[0].toUpperCase()}
                                     </div>
-                                    {userData.role === 'admin' ? (
-                                        <Briefcase className="w-5 h-5 text-gray-700" />
-                                    ) : (
-                                        <GraduationCap className="w-5 h-5 text-gray-700" />
-                                    )}
+                                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {userMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-64 max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-2 overflow-hidden">
-                                        <div className="px-4 py-2 border-b border-gray-200 space-y-1">
-                                            <p className="text-sm font-semibold text-gray-900 break-all leading-tight">{userData.email}</p>
-                                            <p className="text-xs text-gray-600 capitalize">{userData.role}</p>
+                                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2">
+                                        <div className="px-4 py-3 border-b border-gray-50">
+                                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{userData.role}</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate">{userData.email}</p>
                                         </div>
-                                        <button
-                                            onClick={handleSignOut}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                        >
+                                        <button onClick={handleSignOut} className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
                                             <LogOut className="w-4 h-4" /> Sign Out
                                         </button>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <Link
-                                href="/login"
-                                className="px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
-                            >
+                            <Link href="/login" className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-full hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all">
                                 Sign In
                             </Link>
                         )}
                     </div>
-
-                    {/* Mobile menu button */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
-                        aria-label="Toggle navigation"
-                    >
-                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </button>
                 </div>
-
-                {/* Mobile Navigation */}
-                {mobileMenuOpen && (
-                    <div className="md:hidden pb-4">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className={`block px-3 py-2 rounded-md text-base font-medium ${pathname === link.href
-                                        ? 'text-primary-600 bg-primary-50'
-                                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-
-                        {userData ? (
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                                <div className="px-3 py-2">
-                                    <p className="text-sm font-semibold text-gray-900">{userData.email}</p>
-                                    <p className="text-xs text-gray-600 capitalize">{userData.role}</p>
-                                </div>
-                                <button
-                                    onClick={handleSignOut}
-                                    className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
-                                >
-                                    Sign Out
-                                </button>
-                            </div>
-                        ) : (
-                            <Link
-                                href="/login"
-                                className="block mt-4 px-3 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 text-center"
-                            >
-                                Sign In
-                            </Link>
-                        )}
-                    </div>
-                )}
             </nav>
         </header>
     )

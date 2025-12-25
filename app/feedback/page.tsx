@@ -6,14 +6,22 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { onAuthChange } from '@/lib/auth'
 
-const EMOJI_RATINGS = [
-    { emoji: '😄', label: 'Loved it!', value: 4 },
-    { emoji: '🙂', label: 'Good', value: 3 },
-    { emoji: '😐', label: 'Okay', value: 2 },
-    { emoji: '😞', label: 'Poor', value: 1 },
-]
+interface SpeechRecognitionEvent extends Event {
+    results: {
+        [key: number]: {
+            [key: number]: {
+                transcript: string;
+            };
+        };
+    };
+}
 
-const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snacks']
+const EMOJI_RATINGS = [
+    { emoji: '😄', label: 'Loved it!', value: 4, sentiment: 'POSITIVE', color: 'border-[#10b981] bg-[#ecfdf5] text-[#059669]' },
+    { emoji: '🙂', label: 'Good', value: 3, sentiment: 'POSITIVE', color: 'border-[#10b981] bg-[#ecfdf5] text-[#059669]' },
+    { emoji: '😐', label: 'Okay', value: 2, sentiment: 'NEUTRAL', color: 'border-[#94a3b8] bg-[#f8fafc] text-[#475569]' },
+    { emoji: '😞', label: 'Poor', value: 1, sentiment: 'NEGATIVE', color: 'border-[#f43f5e] bg-[#fff1f2] text-[#e11d48]' },
+]
 
 export default function FeedbackPage() {
     const [loading, setLoading] = useState(true)
@@ -23,201 +31,158 @@ export default function FeedbackPage() {
     const [mealType, setMealType] = useState('')
     const [dishName, setDishName] = useState('')
     const [rating, setRating] = useState<number | null>(null)
-    
-    // Voice Feedback States
     const [transcript, setTranscript] = useState('')
     const [isListening, setIsListening] = useState(false)
-    
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [showSuccess, setShowSuccess] = useState(false)
 
-    // AUTH GUARD
     useEffect(() => {
         const unsubscribe = onAuthChange((user) => {
-            if (!user) {
-                router.push('/login')
-            } else {
-                setCurrentUser(user)
-                setLoading(false)
-            }
+            if (!user) router.push('/login')
+            else { setCurrentUser(user); setLoading(false); }
         })
         return () => unsubscribe()
     }, [router])
 
-    // --- SPEECH RECOGNITION LOGIC ---
     const toggleListening = () => {
+        if (typeof window === 'undefined') return;
         const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
-        if (!SpeechRecognition) {
-            alert("Your browser does not support voice input. Please use Chrome.")
-            return
-        }
+        if (!SpeechRecognition) return alert("Please use Chrome.")
 
         const recognition = new SpeechRecognition()
-        recognition.lang = 'en-US'
-        recognition.continuous = false
-
         recognition.onstart = () => setIsListening(true)
         recognition.onend = () => setIsListening(false)
+        recognition.onresult = (event: SpeechRecognitionEvent) => setTranscript(event.results[0][0].transcript)
         
-        recognition.onresult = (event: any) => {
-            const currentTranscript = event.results[0][0].transcript
-            setTranscript(currentTranscript)
-        }
-
-        if (isListening) {
-            recognition.stop()
-        } else {
-            recognition.start()
-        }
+        isListening ? recognition.stop() : recognition.start()
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!mealType || !dishName || rating === null) {
-            alert('Please fill in all required fields')
-            return
-        }
-
+        if (!mealType || !dishName || rating === null) return
         setIsSubmitting(true)
-
         try {
-            if (!currentUser) return;
-
+            const selectedRating = EMOJI_RATINGS.find(r => r.value === rating);
             await addDoc(collection(db, 'feedback'), {
-                uid: currentUser.uid,
-                email: currentUser.email,
-                mealType,
-                dishName,
-                rating,
-                // Save the text from the voice note for the AI to analyze
-                transcript: transcript, 
-                hasVoiceNote: transcript.length > 0,
+                uid: currentUser?.uid,
+                email: currentUser?.email,
+                mealType, dishName, rating, transcript,
+                sentiment: selectedRating?.sentiment,
                 timestamp: serverTimestamp(),
-                sentiment: rating >= 3 ? 'positive' : rating === 2 ? 'neutral' : 'negative'
             })
-
-            setShowSuccess(true)
-            setTimeout(() => {
-                setMealType('')
-                setDishName('')
-                setRating(null)
-                setTranscript('')
-                setShowSuccess(false)
-            }, 2500)
-
-        } catch (error) {
-            console.error('Error submitting feedback:', error)
-            alert('Failed to submit feedback.')
-        } finally {
-            setIsSubmitting(false)
-        }
+            setMealType(''); setDishName(''); setRating(null); setTranscript('');
+            alert("Sent!")
+        } catch (error) { console.error(error) } 
+        finally { setIsSubmitting(false) }
     }
 
-    if (loading) return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        </div>
-    )
+    if (loading) return <div className="min-h-screen flex items-center justify-center bg-white"><div className="h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>
 
     return (
-        <div className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
-            <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Share Your Feedback</h1>
-                    <p className="text-gray-600 italic text-sm">Logging feedback as: {currentUser?.email}</p>
-                </div>
+        <div className="relative py-12 px-4 bg-[#f1f5f9] min-h-screen flex items-center justify-center overflow-hidden">
+            
+            {/* --- INTENSIFIED DOODLE BACKGROUND --- */}
+            <div className="absolute inset-0 z-0 opacity-[0.15] pointer-events-none select-none">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <pattern id="heavy-doodle" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+                        {/* Pizza Slice */}
+                        <path d="M40 40 L70 40 L55 70 Z" stroke="#059669" strokeWidth="3" fill="none" strokeLinejoin="round"/>
+                        <circle cx="50" cy="48" r="2" fill="#059669"/>
+                        <circle cx="60" cy="48" r="2" fill="#059669"/>
+                        
+                        {/* Burger/Bun */}
+                        <path d="M120 50 q15 -20 30 0 v10 h-30 Z" stroke="#0f172a" strokeWidth="3" fill="none"/>
+                        <path d="M120 65 h30" stroke="#0f172a" strokeWidth="3" />
 
-                <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+                        {/* Coffee Mug */}
+                        <path d="M40 120 h25 v20 q0 8 -8 8 h-9 q-8 0 -8 -8 Z" stroke="#0f172a" strokeWidth="3" fill="none" />
+                        <path d="M65 125 q5 0 5 5 t-5 5" stroke="#0f172a" strokeWidth="3" fill="none" />
+
+                        {/* Cutlery Cross */}
+                        <path d="M130 120 l20 20 M150 120 l-20 20" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
+                        
+                        {/* Decorative Dots */}
+                        <circle cx="90" cy="90" r="3" fill="#059669"/>
+                        <circle cx="10" cy="150" r="3" fill="#0f172a"/>
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#heavy-doodle)" />
+                </svg>
+            </div>
+
+            <div className="relative z-10 w-full max-w-md">
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-sm">
+                    <div className="mb-8 text-center">
+                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">How was your meal?</h1>
+                        <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest">Logged in as {currentUser?.email?.split('@')[0]}</p>
+                    </div>
+                    
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Meal Type */}
-                        <div>
-                            <label htmlFor="meal-type" className="block text-sm font-bold text-gray-700 mb-2">Meal Type</label>
-                            <select 
-                                id="meal-type"
-                                value={mealType} 
-                                onChange={(e) => setMealType(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-xl text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 appearance-none cursor-pointer"
-                                required
-                            >
-                                <option value="" disabled>Select a meal</option>
-                                {MEAL_TYPES.map(m => <option key={m} value={m}>{m}</option>)}
-                            </select>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Session</label>
+                                <select value={mealType} onChange={(e) => setMealType(e.target.value)} className="w-full p-4 text-sm border-2 border-slate-50 rounded-2xl bg-slate-50 font-bold outline-none focus:border-emerald-500 transition-all appearance-none" required>
+                                    <option value="">Select</option>
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Lunch">Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Dish</label>
+                                <input type="text" value={dishName} onChange={(e) => setDishName(e.target.value)} className="w-full p-4 text-sm border-2 border-slate-50 rounded-2xl bg-slate-50 font-bold outline-none focus:border-emerald-500 transition-all" placeholder="Dish name" required />
+                            </div>
                         </div>
 
-                        {/* Dish Name */}
-                        <div>
-                            <label htmlFor="dish-name" className="block text-sm font-bold text-gray-700 mb-2">Dish Name</label>
-                            <input 
-                                id="dish-name"
-                                type="text" 
-                                value={dishName} 
-                                onChange={(e) => setDishName(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-600"
-                                placeholder="What did you eat?"
-                                required
-                            />
-                        </div>
-
-                        {/* Rating */}
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-4">Rating</label>
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Rating</label>
                             <div className="grid grid-cols-4 gap-2">
                                 {EMOJI_RATINGS.map((item) => (
-                                    <button
-                                        key={item.value}
-                                        type="button"
-                                        onClick={() => setRating(item.value)}
-                                        className={`p-4 rounded-xl border-2 transition-all ${rating === item.value ? 'border-primary-600 bg-primary-50' : 'border-gray-100 hover:border-gray-300'}`}
-                                    >
-                                        <div className="text-3xl">{item.emoji}</div>
-                                        <div className="text-xs mt-1 font-bold text-gray-700">{item.label}</div>
+                                    <button key={item.value} type="button" onClick={() => setRating(item.value)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center justify-center ${rating === item.value ? item.color : 'border-transparent bg-slate-50 text-slate-400'}`}>
+                                        <span className="text-2xl">{item.emoji}</span>
+                                        <span className="text-[8px] font-black uppercase mt-1.5 tracking-tighter">{item.label}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* --- NEW VOICE FEEDBACK SECTION --- */}
-                        <div className="pt-4 border-t border-gray-100">
-                            <label className="block text-sm font-bold text-gray-700 mb-3">Voice Feedback (Tell AI why you liked/disliked it)</label>
-                            <div className="flex flex-col items-center gap-4 bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200">
-                                <button
-                                    type="button"
-                                    onClick={toggleListening}
-                                    className={`w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all shadow-md ${
-                                        isListening ? 'bg-red-500 animate-pulse text-white' : 'bg-primary-600 text-white hover:bg-primary-700'
-                                    }`}
-                                >
-                                    {isListening ? '🛑' : '🎤'}
-                                </button>
-                                <div className="text-center">
-                                    <p className="text-sm font-medium text-gray-800">
-                                        {isListening ? "Listening..." : transcript ? "Transcription Received:" : "Tap to speak feedback"}
-                                    </p>
-                                    {transcript && (
-                                        <p className="mt-2 text-xs text-gray-500 italic px-4 leading-relaxed">
-                                            {transcript}
-                                        </p>
-                                    )}
-                                </div>
+                        {/* Optimized Voice Bar */}
+                        <div className={`flex items-center gap-4 p-3 pr-5 rounded-2xl border-2 transition-all ${isListening ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-50'}`}>
+                            <button type="button" onClick={toggleListening} className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-sm ${isListening ? 'bg-white scale-105' : 'bg-white hover:shadow-md'}`}>
+                                {isListening ? (
+                                    <div className="flex gap-1 items-center h-5">
+                                        <span className="w-1 bg-blue-500 rounded-full animate-google-bounce" style={{animationDelay: '0s'}}></span>
+                                        <span className="w-1 bg-red-500 rounded-full animate-google-bounce" style={{animationDelay: '0.1s'}}></span>
+                                        <span className="w-1 bg-yellow-500 rounded-full animate-google-bounce" style={{animationDelay: '0.2s'}}></span>
+                                        <span className="w-1 bg-green-500 rounded-full animate-google-bounce" style={{animationDelay: '0.3s'}}></span>
+                                    </div>
+                                ) : (
+                                    <svg className="w-6 h-6" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path fill="#34A853" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                                    </svg>
+                                )}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-[9px] font-black uppercase tracking-widest ${isListening ? 'text-emerald-600' : 'text-slate-400'}`}>Voice Note</p>
+                                <p className="text-xs font-bold text-slate-700 truncate mt-0.5 italic">{transcript || 'Tap to record details...'}</p>
                             </div>
+                            {transcript && !isListening && (
+                                <button type="button" onClick={() => setTranscript('')} className="text-slate-300 hover:text-rose-500 font-bold text-xl">×</button>
+                            )}
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 disabled:bg-gray-400 transition-colors shadow-lg"
-                        >
+                        <button type="submit" disabled={isSubmitting} className="w-full py-5 bg-[#059669] text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-emerald-200/50 active:scale-[0.97] transition-all disabled:opacity-50">
                             {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
                         </button>
                     </form>
-
-                    {showSuccess && (
-                        <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-xl text-center font-bold animate-bounce">
-                            Success! Thank you for your feedback.
-                        </div>
-                    )}
                 </div>
             </div>
+
+            <style jsx global>{`
+                @keyframes google-bounce {
+                    0%, 100% { height: 8px; }
+                    50% { height: 22px; }
+                }
+                .animate-google-bounce { animation: google-bounce 0.6s ease-in-out infinite; }
+            `}</style>
         </div>
     )
 }

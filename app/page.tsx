@@ -1,22 +1,20 @@
 'use client'
 
-import { useEffect, useState, ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import {
-    UtensilsCrossed,
-    Rocket,
-    Target,
-    BarChart3,
-    AlertTriangle,
-    Sparkles,
-    Bot,
-    Smartphone,
-    TrendingDown,
-    PiggyBank,
-    Leaf,
-} from 'lucide-react'
 import { onAuthChange } from '@/lib/auth'
 import { User } from 'firebase/auth'
+import { 
+    UtensilsCrossed, 
+    Rocket, 
+    Target, 
+    BarChart3, 
+    Sparkles, 
+    AlertTriangle, 
+    MapPin,
+    BrainCircuit,
+    History
+} from 'lucide-react'
 
 export default function HomePage() {
     const [user, setUser] = useState<User | null>(null)
@@ -31,139 +29,107 @@ export default function HomePage() {
     }, [])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-green-50">
-            {/* Hero Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
-                <div className="text-center">
-                    {/* Logo & Branding */}
-                    <div className="flex justify-center mb-8">
-                        <div className="bg-white rounded-3xl p-8 shadow-2xl ring-1 ring-primary-100">
-                            <UtensilsCrossed className="w-16 h-16 text-primary-600" />
-                        </div>
-                    </div>
+        <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-emerald-500/30 overflow-x-hidden flex flex-col justify-center">
+            {/* Background Glows */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
+            </div>
 
-                    <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
-                        Zero<span className="text-primary-600">Plate</span>
+            <main className="relative z-10 max-w-6xl mx-auto px-6 py-12 w-full">
+                {/* Hero Section */}
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full mb-6">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Gemini AI Integrated</span>
+                    </div>
+                    
+                    <h1 className="text-6xl md:text-8xl font-black text-white mb-4 tracking-tighter leading-tight">
+                        Zero<span className="text-emerald-500">Plate</span>
                     </h1>
 
-                    <p className="text-2xl md:text-3xl text-gray-600 mb-4 font-medium max-w-3xl mx-auto leading-relaxed">
-                        Reducing food waste, one meal at a time
+                    <p className="text-xl md:text-2xl text-slate-400 mb-10 font-medium max-w-2xl mx-auto">
+                        Reducing food waste, one meal at a time.
                     </p>
 
-                    <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-                        AI-powered insights to help mess halls reduce waste by up to 40%
-                    </p>
-
-                    {/* CTA Buttons - Dynamic based on Auth */}
-                    <div className="flex flex-col sm:flex-row gap-5 justify-center mb-20">
+                    {/* CTA Buttons - Logic Intact */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         {loading ? (
-                            <div className="h-16 w-48 bg-gray-200 animate-pulse rounded-xl"></div>
+                            <div className="h-14 w-48 bg-white/5 animate-pulse rounded-2xl"></div>
                         ) : !user ? (
                             <Link
                                 href="/login"
-                                className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center flex items-center justify-center gap-2"
+                                className="w-full sm:w-auto bg-white text-slate-950 px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-emerald-400 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10"
                             >
-                                <Rocket className="w-5 h-5" /> Get Started / Login
+                                <Rocket className="w-4 h-4" /> Get Started / Login
                             </Link>
                         ) : (
                             <>
                                 <Link
                                     href="/feedback"
-                                    className="btn-primary text-lg px-10 py-5 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-all text-center flex items-center justify-center gap-2"
+                                    className="w-full sm:w-auto bg-emerald-500 text-slate-950 px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
                                 >
-                                    <Target className="w-5 h-5" /> Give Feedback
+                                    <Target className="w-4 h-4" /> Give Feedback
                                 </Link>
                                 <Link
                                     href="/dashboard"
-                                    className="btn-secondary text-lg px-10 py-5 border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all text-center flex items-center justify-center gap-2"
+                                    className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-2"
                                 >
-                                    <BarChart3 className="w-5 h-5" /> Admin Dashboard
+                                    <BarChart3 className="w-4 h-4" /> Admin Dashboard
                                 </Link>
                             </>
                         )}
                     </div>
                 </div>
 
-                {/* Problem & Solution Section */}
-                <div className="mt-24 grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                    {/* Problem */}
-                    <div className="card p-10 border-2 border-gray-100 bg-white rounded-2xl">
-                        <div className="text-5xl mb-6 text-amber-500"><AlertTriangle className="w-12 h-12" /></div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-5">The Problem</h2>
-                        <p className="text-gray-600 leading-relaxed text-lg">
-                            Mess halls waste tons of food daily due to poor demand forecasting,
-                            lack of student feedback, and no data-driven insights on meal preferences.
-                            This leads to environmental harm and resource inefficiency.
-                        </p>
+                {/* Main Feature Grid - Functional Items Only */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mb-16">
+                    
+                    {/* Feature 1: AI Analysis */}
+                    <div className="bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] hover:border-emerald-500/50 transition-all">
+                        <div className="bg-emerald-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4">
+                            <BrainCircuit className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <h3 className="font-black text-white text-xs uppercase tracking-[0.15em] mb-2">AI Insights</h3>
+                        <p className="text-slate-500 text-[11px] leading-relaxed font-medium tracking-wide">Predictive analytics powered by Gemini to optimize daily meal production.</p>
                     </div>
 
-                    {/* Solution */}
-                    <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-10 shadow-xl hover:shadow-2xl transition-shadow text-white border-2 border-primary-500">
-                        <div className="text-5xl mb-6"><Sparkles className="w-12 h-12" /></div>
-                        <h2 className="text-3xl font-bold mb-5">Our Solution</h2>
-                        <p className="leading-relaxed text-lg opacity-95">
-                            ZeroPlate uses AI-powered analytics to collect real-time student feedback,
-                            analyze meal preferences, and provide actionable insights to mess admins.
-                            Reduce waste by up to 40% with data-driven decision making.
-                        </p>
+                    {/* Feature 2: NGO Locator */}
+                    <div className="bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] hover:border-blue-500/50 transition-all">
+                        <div className="bg-blue-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4">
+                            <MapPin className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <h3 className="font-black text-white text-xs uppercase tracking-[0.15em] mb-2">NGO Locator</h3>
+                        <p className="text-slate-500 text-[11px] leading-relaxed font-medium tracking-wide">Integrated maps to locate and connect with nearby NGOs for surplus food.</p>
                     </div>
+
+                    {/* Feature 3: Real-time Admin */}
+                    <div className="bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] hover:border-purple-500/50 transition-all">
+                        <div className="bg-purple-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4">
+                            <BarChart3 className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h3 className="font-black text-white text-xs uppercase tracking-[0.15em] mb-2">Live Dashboard</h3>
+                        <p className="text-slate-500 text-[11px] leading-relaxed font-medium tracking-wide">Real-time monitoring of student feedback and waste metrics for admins.</p>
+                    </div>
+
+                    {/* Feature 4: Impact Logs */}
+                    <div className="bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] hover:border-orange-500/50 transition-all">
+                        <div className="bg-orange-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4">
+                            <History className="w-5 h-5 text-orange-400" />
+                        </div>
+                        <h3 className="font-black text-white text-xs uppercase tracking-[0.15em] mb-2">Waste Logs</h3>
+                        <p className="text-slate-500 text-[11px] leading-relaxed font-medium tracking-wide">Comprehensive historical data tracking consumption patterns and savings.</p>
+                    </div>
+
                 </div>
 
-                {/* Features Grid */}
-                <div className="mt-24">
-                    <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">Why ZeroPlate?</h3>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <FeatureCard
-                            icon={<BarChart3 className="w-10 h-10 text-primary-600" />}
-                            title="Real-time Analytics"
-                            description="Track ratings, sentiment, and waste patterns instantly"
-                        />
-                        <FeatureCard
-                            icon={<Bot className="w-10 h-10 text-primary-600" />}
-                            title="AI Insights"
-                            description="Get smart recommendations powered by Gemini AI"
-                        />
-                        <FeatureCard
-                            icon={<Smartphone className="w-10 h-10 text-primary-600" />}
-                            title="Easy Feedback"
-                            description="Students submit feedback in seconds with emoji ratings"
-                        />
-                        <FeatureCard
-                            icon={<TrendingDown className="w-10 h-10 text-primary-600" />}
-                            title="Waste Reduction"
-                            description="Optimize portions based on actual consumption data"
-                        />
-                        <FeatureCard
-                            icon={<PiggyBank className="w-10 h-10 text-primary-600" />}
-                            title="Cost Savings"
-                            description="Reduce food costs by eliminating overproduction"
-                        />
-                        <FeatureCard
-                            icon={<Leaf className="w-10 h-10 text-primary-600" />}
-                            title="Sustainability"
-                            description="Contribute to environmental conservation efforts"
-                        />
-                    </div>
+                {/* Team Footer */}
+                <div className="text-center border-t border-white/5 pt-8">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">
+                        Built by <span className="text-emerald-500">Aksh & Aditi</span> @ A² Labs
+                    </p>
                 </div>
-
-                {/* Team Section */}
-                <div className="mt-24 text-center">
-                    <div className="inline-block bg-white px-12 py-8 border-2 border-primary-100 rounded-2xl shadow-sm">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Built by A² Labs</h3>
-                        <p className="text-xl text-primary-600 font-semibold">Aksh & Aditi</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-    )
-}
-
-function FeatureCard({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
-    return (
-        <div className="bg-white p-8 border border-gray-100 group hover:border-primary-200 transition-all rounded-2xl shadow-sm">
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform flex items-center">{icon}</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
-            <p className="text-gray-600 leading-relaxed">{description}</p>
+            </main>
         </div>
     )
 }

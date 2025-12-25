@@ -1,3 +1,8 @@
+'use client'
+
+import React from 'react'
+import { Star, Activity, Trash2, TrendingUp } from 'lucide-react'
+
 export default function OverviewCards({
     avgRating,
     sentimentDist,
@@ -5,69 +10,109 @@ export default function OverviewCards({
 }: {
     avgRating: number
     sentimentDist: { positive: number; neutral: number; negative: number }
-    estimatedWaste: number  // Now receives real data from parent
+    estimatedWaste: number
 }) {
     return (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Average Rating Card */}
-            <div className="card p-8 border-2 border-gray-100">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="bg-primary-100 rounded-2xl p-4">
-                        <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            
+            {/* 1. Average Rating Card */}
+            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-6">
+                    <div className="bg-emerald-50 rounded-2xl p-3">
+                        <Star className="w-8 h-8 text-emerald-600" fill="currentColor" />
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase tracking-wider">
+                            User Satisfaction
+                        </span>
                     </div>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Average Rating</p>
-                    <p className="text-5xl font-bold text-gray-900">{avgRating.toFixed(1)}</p>
-                    <p className="text-base text-gray-600 mt-2">out of 4.0</p>
-                </div>
-            </div>
-
-            {/* Sentiment Distribution Card */}
-            <div className="card p-8 border-2 border-gray-100">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="bg-blue-100 rounded-2xl p-4">
-                        <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Avg Rating</p>
+                    <div className="flex items-baseline gap-2">
+                        <h3 className="text-5xl font-black text-gray-900">{avgRating.toFixed(1)}</h3>
+                        <span className="text-gray-400 font-bold">/ 4.0</span>
                     </div>
-                </div>
-                <div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Sentiment Distribution</p>
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <span className="text-base text-gray-700 font-medium">😄 Positive</span>
-                            <span className="text-2xl font-bold text-green-600">{sentimentDist.positive}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-base text-gray-700 font-medium">😐 Neutral</span>
-                            <span className="text-2xl font-bold text-yellow-600">{sentimentDist.neutral}%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-base text-gray-700 font-medium">😞 Negative</span>
-                            <span className="text-2xl font-bold text-red-600">{sentimentDist.negative}%</span>
-                        </div>
+                    {/* Visual Progress Bar */}
+                    <div className="mt-4 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                            className="h-full bg-emerald-500 transition-all duration-1000" 
+                            style={{ width: `${(avgRating / 4) * 100}%` }}
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Estimated Food Waste Card */}
-            <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow text-white border-2 border-red-400">
-                <div className="flex items-start justify-between mb-6">
-                    <div className="bg-white bg-opacity-25 rounded-2xl p-4">
-                        <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
+            {/* 2. Sentiment Distribution Card */}
+            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-6">
+                    <div className="bg-blue-50 rounded-2xl p-3">
+                        <Activity className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase tracking-wider">
+                        Live Sentiment
+                    </span>
+                </div>
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between group">
+                        <span className="text-sm font-bold text-gray-600">😄 Positive</span>
+                        <div className="flex items-center gap-3">
+                            <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
+                                <div className="h-full bg-green-500" style={{ width: `${sentimentDist.positive}%` }} />
+                            </div>
+                            <span className="text-lg font-black text-green-600 w-10 text-right">{sentimentDist.positive}%</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between group">
+                        <span className="text-sm font-bold text-gray-600">😐 Neutral</span>
+                        <div className="flex items-center gap-3">
+                            <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
+                                <div className="h-full bg-yellow-500" style={{ width: `${sentimentDist.neutral}%` }} />
+                            </div>
+                            <span className="text-lg font-black text-yellow-600 w-10 text-right">{sentimentDist.neutral}%</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between group">
+                        <span className="text-sm font-bold text-gray-600">😞 Negative</span>
+                        <div className="flex items-center gap-3">
+                            <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
+                                <div className="h-full bg-red-500" style={{ width: `${sentimentDist.negative}%` }} />
+                            </div>
+                            <span className="text-lg font-black text-red-600 w-10 text-right">{sentimentDist.negative}%</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <p className="text-sm font-semibold uppercase tracking-wide mb-2 opacity-95">Estimated Food Waste</p>
-                    <p className="text-5xl font-bold">{estimatedWaste}</p>
-                    <p className="text-lg mt-2 opacity-95">kg today</p>
+            </div>
+
+            {/* 3. Estimated Food Waste Card */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] p-8 text-white shadow-xl shadow-slate-200 relative overflow-hidden group">
+                {/* Background Decoration */}
+                <Trash2 className="absolute -right-4 -bottom-4 w-32 h-32 text-white opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-500" />
+                
+                <div className="flex justify-between items-start mb-8 relative z-10">
+                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/10">
+                        <TrendingUp className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full uppercase tracking-widest">
+                        Environmental Impact
+                    </span>
+                </div>
+                
+                <div className="relative z-10">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Waste Generated</p>
+                    <div className="flex items-baseline gap-2">
+                        <h3 className="text-6xl font-black text-white">{estimatedWaste}</h3>
+                        <span className="text-2xl font-bold text-emerald-400">kg</span>
+                    </div>
+                    <p className="text-sm text-slate-400 mt-2 font-medium">Recorded for today</p>
+                    
+                    <div className="mt-6 flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-400/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        AI TRACKING ACTIVE
+                    </div>
                 </div>
             </div>
+
         </div>
     )
 }

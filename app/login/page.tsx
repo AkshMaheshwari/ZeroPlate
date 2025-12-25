@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { UtensilsCrossed, Lock, AlertTriangle } from 'lucide-react'
+import { UtensilsCrossed, Lock, AlertTriangle, Sparkles } from 'lucide-react'
 import { signInUser, signInWithGoogle } from '@/lib/auth'
 
 export default function LoginPage() {
@@ -13,7 +13,6 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
-    // Email/Password Login Handler
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
@@ -21,8 +20,6 @@ export default function LoginPage() {
 
         try {
             const userData = await signInUser(email, password)
-
-            // Redirect based on role
             if (userData.role === 'admin') {
                 router.push('/dashboard')
             } else {
@@ -35,15 +32,12 @@ export default function LoginPage() {
         }
     }
 
-    // Google Sign-In Handler
     const handleGoogleSignIn = async () => {
         setError('')
         setLoading(true)
 
         try {
             const userData = await signInWithGoogle()
-
-            // Redirect based on role returned from Google Auth logic
             if (userData.role === 'admin') {
                 router.push('/dashboard')
             } else {
@@ -54,31 +48,36 @@ export default function LoginPage() {
         } finally {
             setLoading(false)
         }
-
-
-    
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full">
+        <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-emerald-500/30 flex items-center justify-center py-12 px-4 relative overflow-hidden">
+            {/* Background Glows */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
+            </div>
+
+            <div className="max-w-md w-full relative z-10">
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="flex justify-center mb-4">
-                        <div className="bg-primary-100 rounded-3xl p-6">
-                            <UtensilsCrossed className="w-14 h-14 text-primary-600" />
-                        </div>
+                <div className="text-center mb-10">
+                    <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full mb-6">
+                        <Sparkles className="w-3 h-3 text-emerald-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Secure Access</span>
                     </div>
-                    <h2 className="text-4xl font-bold text-gray-900 mb-2">Welcome to ZeroPlate</h2>
-                    <p className="text-lg text-gray-600">Sign in to continue</p>
+                    
+                    <h2 className="text-5xl font-black text-white mb-2 tracking-tighter">
+                        Zero<span className="text-emerald-500">Plate</span>
+                    </h2>
+                    <p className="text-slate-400 font-medium">Welcome back, enter your details</p>
                 </div>
 
-                {/* Login Form */}
-                <div className="card p-8 border-2 border-gray-100 bg-white rounded-2xl shadow-sm">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Glassmorphic Card */}
+                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email Input */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
+                            <label htmlFor="email" className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
                                 Email Address
                             </label>
                             <input
@@ -86,17 +85,15 @@ export default function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="student@university.edu"
-                                className="input w-full p-3 border rounded-xl"
+                                placeholder="name@university.edu"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                                 required
-                                autoComplete="email"
-                                autoFocus
                             />
                         </div>
 
                         {/* Password Input */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-2">
+                            <label htmlFor="password" className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">
                                 Password
                             </label>
                             <input
@@ -105,35 +102,33 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="input w-full p-3 border rounded-xl"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                                 required
-                                autoComplete="current-password"
                             />
                         </div>
 
                         {/* Error Message */}
                         {error && (
-                            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl flex items-center gap-2 text-sm text-red-700 font-medium">
-                                <AlertTriangle className="w-5 h-5" /> {error}
+                            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-xs text-rose-400 font-bold uppercase tracking-tight">
+                                <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
                             </div>
                         )}
 
-                        {/* Email/Password Submit Button */}
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-primary w-full py-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            className="w-full py-4 bg-emerald-500 text-slate-950 font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:cursor-not-allowed group"
                         >
                             {loading ? (
-                                <span className="flex items-center justify-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Processing...
+                                <span className="flex items-center justify-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                                    Authenticating...
                                 </span>
                             ) : (
-                                <span className="flex items-center justify-center gap-2"><Lock className="w-5 h-5" /> Sign In</span>
+                                <span className="flex items-center justify-center gap-2">
+                                    <Lock className="w-4 h-4 group-hover:scale-110 transition-transform" /> Sign In
+                                </span>
                             )}
                         </button>
                     </form>
@@ -141,37 +136,44 @@ export default function LoginPage() {
                     {/* Divider */}
                     <div className="relative my-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
+                            <div className="w-full border-t border-white/5"></div>
                         </div>
-                        <div className="relative flex justify-center text-sm uppercase">
-                            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
+                            <span className="bg-[#0b1224] px-4 text-slate-500 italic">Auth Provider</span>
                         </div>
                     </div>
 
-                    {/* Google Sign-In Button */}
+                    {/* Google Sign-In */}
                     <button
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-3 px-4 py-4 border-2 border-gray-100 rounded-xl bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-3 px-4 py-4 border border-white/10 rounded-2xl bg-white/5 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all disabled:opacity-50"
                     >
                         <img 
                             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                            className="w-6 h-6" 
+                            className="w-5 h-5" 
                             alt="Google" 
                         />
-                        Sign in with Google
+                        Continue with Google
                     </button>
 
-                    {/* Sign Up Link */}
+                    {/* Footer Links */}
                     <div className="mt-8 text-center">
-                        <p className="text-sm text-gray-600">
-                            Don&apos;t have an account?{' '}
-                            <Link href="/signup" className="font-semibold text-primary-600 hover:text-primary-700">
-                                Sign up here
+                        <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">
+                            New to ZeroPlate?{' '}
+                            <Link href="/signup" className="text-emerald-500 hover:text-emerald-400 transition-colors ml-1">
+                                Create Account
                             </Link>
                         </p>
                     </div>
+                </div>
+
+                {/* Team Footer */}
+                <div className="mt-8 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-700">
+                        Secure Infrastructure @ A² Labs
+                    </p>
                 </div>
             </div>
         </div>
