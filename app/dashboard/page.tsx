@@ -83,9 +83,9 @@ export default function DashboardPage() {
             const avgRating = feedback.length > 0 ? totalRating / feedback.length : 0
             const total = sentimentCount.positive + sentimentCount.neutral + sentimentCount.negative
             const sentimentDist = {
-                positive: total > 0 ? Math.round((sentimentCount.positive / total) * 100) : 0,
-                neutral: total > 0 ? Math.round((sentimentCount.neutral / total) * 100) : 0,
-                negative: total > 0 ? Math.round((sentimentCount.negative / total) * 100) : 0
+                positive: sentimentCount.positive,
+                neutral: sentimentCount.neutral,
+                negative: sentimentCount.negative
             }
 
             // Fetch today's wastage

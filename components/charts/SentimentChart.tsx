@@ -15,9 +15,9 @@ export default function SentimentChart({
     sentimentDist: { positive: number; neutral: number; negative: number }
 }) {
     const data = [
-        { name: 'Positive', value: sentimentDist.positive },
-        { name: 'Neutral', value: sentimentDist.neutral },
-        { name: 'Negative', value: sentimentDist.negative },
+        { name: 'Positive', value: sentimentDist.positive, count: sentimentDist.positive },
+        { name: 'Neutral', value: sentimentDist.neutral, count: sentimentDist.neutral },
+        { name: 'Negative', value: sentimentDist.negative, count: sentimentDist.negative },
     ]
 
     const total = data.reduce((acc, curr) => acc + curr.value, 0)
@@ -65,7 +65,8 @@ export default function SentimentChart({
                                 borderRadius: '16px', 
                                 border: 'none', 
                                 boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' 
-                            }} 
+                            }}
+                            formatter={(value) => `${value} reviews`}
                         />
                     </PieChart>
                 </ResponsiveContainer>
@@ -85,7 +86,10 @@ export default function SentimentChart({
                             </span>
                         </div>
                         <span className="text-sm font-black text-slate-900">
-                            {((item.value / total) * 100).toFixed(0)}%
+                            {item.value}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-bold">
+                            {total > 0 ? `${Math.round((item.value / total) * 100)}%` : '0%'}
                         </span>
                     </div>
                 ))}

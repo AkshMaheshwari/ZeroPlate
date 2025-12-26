@@ -64,7 +64,7 @@ export default function AllInsights() {
                 date: doc.data().date?.toDate?.()?.toISOString() || null
             }));
 
-            const res = await axios.post("http://localhost:3001/analyze-waste", { feedbackData, wastageData });
+            const res = await axios.post("https://zeroplate.onrender.com/analyze-waste", { feedbackData, wastageData });
             const insights: Insight[] = res.data?.insights;
             setSuggestions(insights && insights.length > 0 ? insights : FALLBACK_INSIGHTS);
         } catch (err: any) {
@@ -78,7 +78,7 @@ export default function AllInsights() {
     return (
         <div className="mt-8 space-y-6">
             {/* Header Section */}
-            <div className="flex justify-between items-end px-2">
+            <div className="flex justify-between items-center px-2">
                 <div>
                     <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                         Executive Insights <Sparkles className="w-5 h-5 text-amber-500 fill-amber-500" />
@@ -87,9 +87,9 @@ export default function AllInsights() {
                 </div>
                 <button 
                     onClick={getAIAnalysis}
-                    className="flex items-center gap-2 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-600 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
                 >
-                    <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     Refresh Intelligence
                 </button>
             </div>

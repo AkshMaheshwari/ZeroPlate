@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Package, Users, Leaf } from 'lucide-react'
+import { Package, Users, Leaf, UtensilsCrossed, Building2, Zap, Globe, Star, Trophy } from 'lucide-react'
 import { ImpactMetrics } from '@/lib/ngo'
 import { estimateMealsFed, calculateCO2Saved } from '@/lib/location'
 
@@ -38,127 +38,137 @@ export default function ImpactMetricsComponent({
             label: 'Food Donated',
             value: `${displayMetrics.totalFoodDonated}kg`,
             icon: Package,
-            color: 'from-blue-500 to-blue-600',
-            bgColor: 'bg-blue-50',
-            textColor: 'text-blue-700',
+            color: 'emerald',
+            bgColor: 'bg-emerald-50',
+            textColor: 'text-emerald-700',
+            iconColor: 'text-emerald-600',
         },
         {
             label: 'Total Donations',
             value: displayMetrics.totalDonations,
             icon: Users,
-            color: 'from-green-500 to-green-600',
-            bgColor: 'bg-green-50',
-            textColor: 'text-green-700',
+            color: 'slate',
+            bgColor: 'bg-slate-50',
+            textColor: 'text-slate-700',
+            iconColor: 'text-slate-600',
         },
         {
             label: 'Meals Made',
             value: displayMetrics.estimatedMealsFed.toLocaleString(),
-            icon: '🍽️',
-            color: 'from-orange-500 to-orange-600',
-            bgColor: 'bg-orange-50',
-            textColor: 'text-orange-700',
+            icon: UtensilsCrossed,
+            color: 'blue',
+            bgColor: 'bg-blue-50',
+            textColor: 'text-blue-700',
+            iconColor: 'text-blue-600',
         },
         {
             label: 'NGO Partners',
             value: displayMetrics.ngoPartnershipsCount,
-            icon: '🏢',
-            color: 'from-purple-500 to-purple-600',
-            bgColor: 'bg-purple-50',
-            textColor: 'text-purple-700',
+            icon: Building2,
+            color: 'slate',
+            bgColor: 'bg-slate-50',
+            textColor: 'text-slate-700',
+            iconColor: 'text-slate-600',
         },
         {
             label: 'Active Today',
             value: displayMetrics.activeDonationsToday,
-            icon: '⚡',
-            color: 'from-red-500 to-red-600',
-            bgColor: 'bg-red-50',
-            textColor: 'text-red-700',
+            icon: Zap,
+            color: 'emerald',
+            bgColor: 'bg-emerald-50',
+            textColor: 'text-emerald-700',
+            iconColor: 'text-emerald-600',
         },
         {
             label: 'CO2 Saved',
             value: `${displayMetrics.estimatedCO2Saved}kg`,
             icon: Leaf,
-            color: 'from-teal-500 to-teal-600',
-            bgColor: 'bg-teal-50',
-            textColor: 'text-teal-700',
+            color: 'slate',
+            bgColor: 'bg-slate-50',
+            textColor: 'text-slate-700',
+            iconColor: 'text-slate-600',
         },
     ]
 
     return (
         <div className="space-y-6">
             {/* Main Metric Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stats.map((stat, index) => (
                     <div
                         key={index}
-                        className={`${stat.bgColor} rounded-lg p-6 border-2 border-transparent hover:border-primary-400 transition-all`}
+                        className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all"
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-medium text-gray-700">{stat.label}</h3>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</h3>
                             {typeof stat.icon === 'string' ? (
-                                <span className="text-3xl">{stat.icon}</span>
+                                <span className="text-2xl">{stat.icon}</span>
                             ) : (
-                                <stat.icon className="w-8 h-8" />
+                                <div className="p-2 bg-slate-50 rounded-lg">
+                                    <stat.icon className="w-5 h-5 text-slate-600" />
+                                </div>
                             )}
                         </div>
                         {loading ? (
-                            <div className="h-8 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-8 bg-slate-200 rounded-lg animate-pulse"></div>
                         ) : (
-                            <p className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                            <p className="text-3xl font-black text-slate-900">{stat.value}</p>
                         )}
                     </div>
                 ))}
             </div>
 
             {/* Summary Stats */}
-            <div className="bg-gradient-to-r from-primary-50 to-green-50 rounded-lg p-6 border border-primary-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">🌍 Environmental Impact</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                        <p className="text-2xl font-bold text-primary-600">
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-slate-600" /> Environmental Impact
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
+                        <p className="text-3xl font-black text-slate-900">
                             {displayMetrics.totalFoodDonated}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">Kg Food Saved</p>
+                        <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wider">Kg Food Saved</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-bold text-green-600">
+                    <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
+                        <p className="text-3xl font-black text-emerald-600">
                             {displayMetrics.estimatedCO2Saved}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">Kg CO2 Saved</p>
+                        <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wider">Kg CO2 Saved</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-bold text-orange-600">
+                    <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
+                        <p className="text-3xl font-black text-slate-900">
                             {Math.round(displayMetrics.totalFoodDonated * 0.8)}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">Water Saved (L)</p>
+                        <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wider">Water Saved (L)</p>
                     </div>
-                    <div>
-                        <p className="text-2xl font-bold text-blue-600">
+                    <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
+                        <p className="text-3xl font-black text-slate-900">
                             {displayMetrics.estimatedMealsFed}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">Meals Provided</p>
+                        <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-wider">Meals Provided</p>
                     </div>
                 </div>
             </div>
 
             {/* Recognition Section */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">⭐ Recognition</h3>
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                <h3 className="text-lg font-black text-slate-900 mb-6 flex items-center gap-2"><Star className="w-5 h-5 text-amber-500 fill-amber-500" /> Recognition</h3>
                 <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                        <span className="text-2xl">🏆</span>
+                    <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <Trophy className="w-8 h-8 text-emerald-600 flex-shrink-0" />
                         <div>
-                            <p className="font-semibold text-yellow-900">Zero Waste Champion</p>
-                            <p className="text-sm text-yellow-700">
+                            <p className="font-black text-emerald-900">Zero Waste Champion</p>
+                            <p className="text-sm text-emerald-700 font-medium">
                                 You&apos;ve reduced food waste by {Math.round((displayMetrics.totalFoodDonated / 1500) * 100)}%
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                        <Leaf className="w-8 h-8 text-green-600 flex-shrink-0" />
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <Leaf className="w-8 h-8 text-slate-600 flex-shrink-0" />
                         <div>
-                            <p className="font-semibold text-green-900">Sustainability Leader</p>
-                            <p className="text-sm text-green-700">
+                            <p className="font-black text-slate-900">Sustainability Leader</p>
+                            <p className="text-sm text-slate-600 font-medium">
                                 Contributing to a sustainable future for {displayMetrics.estimatedMealsFed} people
                             </p>
                         </div>

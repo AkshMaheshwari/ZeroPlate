@@ -12,6 +12,11 @@ export default function OverviewCards({
     sentimentDist: { positive: number; neutral: number; negative: number }
     estimatedWaste: number
 }) {
+    const total = sentimentDist.positive + sentimentDist.neutral + sentimentDist.negative
+    const positivePercent = total > 0 ? Math.round((sentimentDist.positive / total) * 100) : 0
+    const neutralPercent = total > 0 ? Math.round((sentimentDist.neutral / total) * 100) : 0
+    const negativePercent = total > 0 ? Math.round((sentimentDist.negative / total) * 100) : 0
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             
@@ -58,27 +63,27 @@ export default function OverviewCards({
                         <span className="text-sm font-bold text-gray-600">😄 Positive</span>
                         <div className="flex items-center gap-3">
                             <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
-                                <div className="h-full bg-green-500" style={{ width: `${sentimentDist.positive}%` }} />
+                                <div className="h-full bg-green-500" style={{ width: `${positivePercent}%` }} />
                             </div>
-                            <span className="text-lg font-black text-green-600 w-10 text-right">{sentimentDist.positive}%</span>
+                            <span className="text-lg font-black text-green-600 w-10 text-right">{positivePercent}%</span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between group">
                         <span className="text-sm font-bold text-gray-600">😐 Neutral</span>
                         <div className="flex items-center gap-3">
                             <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
-                                <div className="h-full bg-yellow-500" style={{ width: `${sentimentDist.neutral}%` }} />
+                                <div className="h-full bg-yellow-500" style={{ width: `${neutralPercent}%` }} />
                             </div>
-                            <span className="text-lg font-black text-yellow-600 w-10 text-right">{sentimentDist.neutral}%</span>
+                            <span className="text-lg font-black text-yellow-600 w-10 text-right">{neutralPercent}%</span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between group">
                         <span className="text-sm font-bold text-gray-600">😞 Negative</span>
                         <div className="flex items-center gap-3">
                             <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
-                                <div className="h-full bg-red-500" style={{ width: `${sentimentDist.negative}%` }} />
+                                <div className="h-full bg-red-500" style={{ width: `${negativePercent}%` }} />
                             </div>
-                            <span className="text-lg font-black text-red-600 w-10 text-right">{sentimentDist.negative}%</span>
+                            <span className="text-lg font-black text-red-600 w-10 text-right">{negativePercent}%</span>
                         </div>
                     </div>
                 </div>

@@ -114,6 +114,57 @@ export default function FeedbackTable({
                 </table>
             </div>
 
+            {/* Mobile View */}
+            <div className="md:hidden">
+                <div className="divide-y divide-slate-50">
+                    {feedbackData.map((feedback, index) => (
+                        <div key={feedback.id || index} className="p-4 hover:bg-[#FBFDFF] transition-colors">
+                            {/* Header with timestamp and sentiment */}
+                            <div className="flex items-start justify-between gap-3 mb-3">
+                                <div className="flex items-center gap-2 text-slate-400 flex-1">
+                                    <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                                    <span className="text-xs font-bold whitespace-nowrap">
+                                        {formatTime(feedback.timestamp)}
+                                    </span>
+                                </div>
+                                <span className={`px-2 py-1 text-[8px] font-black rounded-lg border uppercase tracking-widest whitespace-nowrap flex-shrink-0 ${getSentimentStyles(feedback.sentiment)}`}>
+                                    {feedback.sentiment || 'NEUTRAL'}
+                                </span>
+                            </div>
+
+                            {/* Meal info */}
+                            <div className="mb-3">
+                                <span className="text-[9px] font-black text-[#10B981] uppercase tracking-wider block mb-0.5">
+                                    {feedback.mealType}
+                                </span>
+                                <span className="text-sm font-bold text-slate-900 capitalize block">
+                                    {feedback.dishName}
+                                </span>
+                            </div>
+
+                            {/* Rating and Audio */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex gap-0.5">
+                                    {[...Array(4)].map((_, i) => (
+                                        <Star 
+                                            key={i} 
+                                            className={`w-3.5 h-3.5 ${i < feedback.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-100'}`} 
+                                        />
+                                    ))}
+                                </div>
+                                {feedback.hasVoiceNote ? (
+                                    <div className="inline-flex items-center justify-center w-8 h-8 bg-slate-900 text-white rounded-xl shadow-md hover:scale-110 transition-transform cursor-pointer">
+                                        <Mic className="w-3.5 h-3.5" />
+                                    </div>
+                                ) : (
+                                    <span className="text-slate-200 text-xs">—</span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* Empty State */}
             {feedbackData.length === 0 && (
                 <div className="py-20 text-center bg-white">
