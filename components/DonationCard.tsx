@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Check, Package, UtensilsCrossed, Phone, Mail, PenSquare, Clock4, X } from 'lucide-react'
 import { NGO } from '@/lib/ngo'
+import toast from 'react-hot-toast'
 
 interface DonationCardProps {
     ngo: NGO
@@ -48,9 +49,16 @@ export default function DonationCard({ ngo, onClose, onSubmit }: DonationCardPro
         try {
             await onSubmit(formData)
             setSuccess(true)
+            toast.success('Donation request submitted successfully! 🎉', {
+                duration: 3000,
+            })
             setTimeout(() => onClose(), 2000)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to submit')
+            const errorMessage = err instanceof Error ? err.message : 'Failed to submit donation'
+            setError(errorMessage)
+            toast.error(errorMessage, {
+                duration: 4000,
+            })
         } finally {
             setLoading(false)
         }
