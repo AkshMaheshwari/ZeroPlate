@@ -29,8 +29,8 @@ service cloud.firestore {
       // Only admins can read all feedback
       allow read: if isAdmin();
       
-      // Only students can create feedback
-      allow create: if isStudent();
+      // Students and admins can create feedback
+      allow create: if isStudent() || isAdmin();
       
       // Students can read their own feedback
       allow read: if isStudent() && request.auth.uid == resource.data.uid;

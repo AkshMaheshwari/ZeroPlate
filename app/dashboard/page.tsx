@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { collection, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { isAdmin, onAuthChange } from '@/lib/auth'
+import { isAdmin, onAuthChange, signOut } from '@/lib/auth'
 import OverviewCards from '@/components/OverviewCards'
 import RatingsChart from '@/components/charts/RatingsChart'
 import SentimentChart from '@/components/charts/SentimentChart'
@@ -134,19 +134,35 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto w-full space-y-10 sm:space-y-12">
                 {/* Header */}
-                <div className="mb-12">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="bg-primary-100 rounded-2xl p-3">
-                            <span className="text-4xl">📊</span>
+                <div className="space-y-4 sm:space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                            <div className="bg-primary-100 rounded-2xl p-2.5 sm:p-3">
+                                <span className="text-3xl sm:text-4xl">📊</span>
+                            </div>
+                            <div>
+                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Admin Dashboard</h1>
+                                <p className="text-sm sm:text-base text-gray-600 sm:ml-0">Monitor food waste metrics and student feedback in real-time</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-5xl font-bold text-gray-900">Admin Dashboard</h1>
-                        </div>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    await signOut()
+                                    router.push('/login')
+                                } catch (err) {
+                                    console.error('Logout failed:', err)
+                                }
+                            }}
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white text-gray-800 border border-gray-200 shadow-sm hover:shadow-md active:scale-[0.99] text-sm font-semibold"
+                        >
+                            <span className="text-lg">📱</span>
+                            <span>Logout</span>
+                        </button>
                     </div>
-                    <p className="text-lg text-gray-600 ml-16">Monitor food waste metrics and student feedback in real-time</p>
                 </div>
 
                 {/* Overview Cards */}
@@ -157,29 +173,29 @@ export default function DashboardPage() {
                 />
 
                 {/* Charts Section */}
-                <div className="mt-12 grid lg:grid-cols-2 gap-8">
+                <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
                     <RatingsChart />
                     <SentimentChart sentimentDist={stats.sentimentDist} />
                 </div>
 
                 {/* Wastage Management Section */}
-                <div className="mt-12 grid lg:grid-cols-2 gap-8">
+                <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
                     <WastageTracker />
                     <WastageStats />
                 </div>
 
                 {/* NGO Donation Section */}
-                <div className="mt-12">
+                <div>
                     <NGODonationWidget />
                 </div>
 
                 {/* AI Insights */}
-                <div className="mt-12">
+                <div>
                     <AIInsights />
                 </div>
 
                 {/* Recent Feedback Table */}
-                <div className="mt-12">
+                <div>
                     <FeedbackTable feedbackData={feedbackData} loading={loading} />
                 </div>
             </div>

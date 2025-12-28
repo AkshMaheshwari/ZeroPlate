@@ -1,6 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import { getCurrentUserData, onAuthChange, UserRole } from '@/lib/auth'
 
 interface SpeechRecognitionEvent extends Event {
     results: SpeechRecognitionResultList;
@@ -33,6 +37,7 @@ const EMOJI_RATINGS = [
 ]
 
 export default function FeedbackPage() {
+    const router = useRouter()
     const [mealType, setMealType] = useState('')
     const [dishName, setDishName] = useState('')
     const [rating, setRating] = useState<number | null>(null)
@@ -41,10 +46,28 @@ export default function FeedbackPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [speechSupported, setSpeechSupported] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
+    const [authRole, setAuthRole] = useState<UserRole | null>(null)
+    const [authReady, setAuthReady] = useState(false)
+    const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     
     const recognitionRef = useRef<any>(null)
     const isActiveRef = useRef(false)
     const retryCountRef = useRef(0)
+
+    useEffect(() => {
+        const unsubscribe = onAuthChange(async (user) => {
+            if (!user) {
+                router.push('/login')
+                return
+            }
+
+            const data = await getCurrentUserData()
+            setAuthRole(data?.role ?? null)
+            setAuthReady(true)
+        })
+
+        return () => unsubscribe()
+    }, [router])
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -191,7 +214,12 @@ export default function FeedbackPage() {
 
     const handleSubmit = async () => {
         if (!mealType || !dishName || rating === null) {
-            alert('Please fill in all required fields (Session, Dish, and Rating)')
+            setStatus({ type: 'error', message: 'Please fill in Session, Dish, and Rating.' })
+            return
+        }
+
+        if (!authReady) {
+            setStatus({ type: 'error', message: 'Checking your login, please wait...' })
             return
         }
         
@@ -201,27 +229,26 @@ export default function FeedbackPage() {
             const selectedRating = EMOJI_RATINGS.find(r => r.value === rating)
             const hasVoiceNote = transcript.trim().length > 0
 
-            // Simulate submission
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            
-            console.log('✓ Feedback submitted:', {
-                mealType, 
-                dishName, 
-                rating, 
-                transcript,
+            await addDoc(collection(db, 'feedback'), {
+                mealType,
+                dishName,
+                rating,
+                transcript: transcript.trim(),
                 hasVoiceNote,
-                sentiment: selectedRating?.sentiment,
+                sentiment: selectedRating?.sentiment ?? 'NEUTRAL',
+                timestamp: serverTimestamp(),
+                createdAt: new Date(),
+                uid: (await getCurrentUserData())?.uid ?? null,
             })
-            
-            // Reset
+
             setMealType('')
             setDishName('')
             setRating(null)
             setTranscript('')
-            alert("✓ Feedback submitted successfully!")
+            setStatus({ type: 'success', message: 'Feedback submitted successfully.' })
         } catch (error) {
             console.error('Submission error:', error)
-            alert("✗ Failed to submit feedback. Please try again.")
+            setStatus({ type: 'error', message: 'Failed to submit feedback. Please try again.' })
         } finally {
             setIsSubmitting(false)
         }
@@ -254,6 +281,11 @@ export default function FeedbackPage() {
                     <div className="mb-8 text-center">
                         <h1 className="text-2xl font-black text-slate-900 tracking-tight">How was your meal?</h1>
                         <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest">Demo Feedback Form</p>
+                        {status && (
+                            <div className={`mt-4 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-tight border ${status.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
+                                {status.message}
+                            </div>
+                        )}
                     </div>
                     
                     <div className="space-y-6">
