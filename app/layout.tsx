@@ -10,6 +10,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
     title: 'ZeroPlate - Reducing Food Waste',
     description: 'AI-powered food waste reduction and mess optimization system',
+    icons: {
+        icon: '/icon.svg',
+        apple: '/icon.svg',
+    },
 }
 
 export default function RootLayout({
