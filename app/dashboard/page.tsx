@@ -148,20 +148,6 @@ export default function DashboardPage() {
                                 <p className="text-sm sm:text-base text-gray-600 sm:ml-0">Monitor food waste metrics and student feedback in real-time</p>
                             </div>
                         </div>
-                        <button
-                            onClick={async () => {
-                                try {
-                                    await signOut()
-                                    router.push('/login')
-                                } catch (err) {
-                                    console.error('Logout failed:', err)
-                                }
-                            }}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white text-gray-800 border border-gray-200 shadow-sm hover:shadow-md active:scale-[0.99] text-sm font-semibold"
-                        >
-                            <span className="text-lg">📱</span>
-                            <span>Logout</span>
-                        </button>
                     </div>
                 </div>
 
