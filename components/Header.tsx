@@ -24,6 +24,11 @@ export default function Header() {
         return () => unsubscribe()
     }, [])
 
+    useEffect(() => {
+        setMobileMenuOpen(false)
+        setUserMenuOpen(false)
+    }, [pathname])
+
     const handleSignOut = async () => {
         try {
             await signOut()
@@ -86,8 +91,62 @@ export default function Header() {
                             </Link>
                         )}
                     </div>
+
+                    <button
+                        type="button"
+                        aria-label="Toggle navigation menu"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                    >
+                        {mobileMenuOpen ? <X className="w-5 h-5 text-gray-800" /> : <Menu className="w-5 h-5 text-gray-800" />}
+                    </button>
                 </div>
             </nav>
+
+            {mobileMenuOpen && (
+                <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md shadow-lg">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-2">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={`block w-full px-4 py-3 rounded-xl text-sm font-semibold ${pathname === link.href ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700 hover:bg-gray-50 hover:text-emerald-600'}`}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+
+                        <div className="pt-2 border-t border-gray-100 space-y-2">
+                            {userData ? (
+                                <>
+                                    <div className="flex items-center gap-3 px-4">
+                                        <div className="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold">
+                                            {userData.email[0].toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{userData.role}</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate">{userData.email}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2 font-semibold"
+                                    >
+                                        <LogOut className="w-4 h-4" /> Sign Out
+                                    </button>
+                                </>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="block w-full text-center px-4 py-3 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-md"
+                                >
+                                    Sign In
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     )
 }
