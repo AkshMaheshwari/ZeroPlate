@@ -8,36 +8,40 @@
 
 **Reducing food waste, one meal at a time**
 
-A comprehensive food waste reduction platform for college mess halls that connects students, admins, and NGOs to reduce waste by up to 50% through data-driven insights, real-time feedback, and smart donation management.
+A comprehensive mess optimization and food waste management platform that connects college mess halls with nearby NGOs to minimize food waste, streamline operations, and enable smart donation coordination—backed by real-time feedback, location-based NGO discovery, and data-driven insights.
 
 ## 🎯 Problem Statement
 
-Every day, college mess halls across India waste **thousands of kilograms** of perfectly good food while millions go hungry. The challenges:
-- **Overproduction** leads to massive food waste
-- **No real-time tracking** of what's being wasted
-- **Zero connection** to NGOs who could use excess food
-- **Students' feedback** gets lost in paperwork
-- **No data-driven insights** on meal preferences
+Every day, college mess halls across India waste **thousands of kilograms** of perfectly good food while millions go hungry nearby. The challenges:
+- **Overproduction** and poor meal planning lead to massive food waste
+- **No real-time tracking** of what's being wasted or why
+- **Zero connection** to local NGOs who could redistribute excess food
+- **Students' feedback** on meal quality gets lost in paperwork
+- **No location-based system** to find and coordinate with NGOs quickly
+- **No data-driven insights** to optimize mess operations and reduce waste
 
 ## ✨ Our Solution
 
-ZeroPlate is a Next.js-powered web platform with three core innovations:
+ZeroPlate is a comprehensive **mess optimization and NGO coordination platform** built with Next.js. Three core innovations:
 
-### 1. Real-Time Wastage Analytics
-- Admins track daily food waste by meal type and dish
-- Beautiful charts powered by Recharts show trends over time
-- Sentiment analysis on student feedback reveals *why* food is being wasted
+### 1. Mess Optimization Through Real-Time Analytics
+- Track daily food waste by meal type, dish, and quantity
+- Beautiful charts powered by Recharts reveal waste patterns and trends
+- Sentiment analysis on student feedback shows *why* food is being wasted
+- Data-driven insights help optimize meal planning and reduce overproduction
 
-### 2. Smart NGO Connections
-- Interactive Leaflet maps show nearby NGOs accepting food donations
-- Filter by distance (up to 50km), food type, and capacity
-- One-click donation scheduling with complete NGO details
-- 10 verified NGOs across major Indian cities
+### 2. Location-Based NGO Discovery & Coordination
+- **Interactive Leaflet maps** show nearby NGOs accepting food donations in real-time
+- **Smart filters**: Search by distance (up to 50km), food type preferences, and NGO capacity
+- **One-click scheduling**: Complete NGO contact details for instant coordination
+- **10 verified NGOs** across major Indian cities (Delhi, Mumbai, Bangalore, Chennai, Kolkata, etc.)
+- **Zero API costs** using OpenStreetMap with precise geolocation
 
-### 3. Voice-Powered Insights
-- Students use voice-to-text for instant feedback
-- Web Speech API automatically generates transcripts
-- Admins read all feedback with sentiment analysis
+### 3. Voice-Powered Feedback System
+- Students use **Web Speech API** for instant voice-to-text feedback
+- Automatic transcription eliminates typing friction
+- Admins access all feedback with automated sentiment classification
+- Real-time insights improve mess operations and student satisfaction
 
 ## 🚀 Features
 
@@ -48,12 +52,13 @@ ZeroPlate is a Next.js-powered web platform with three core innovations:
 - **🔐 Secure Login**: Google OAuth and Email authentication
 
 ### For Admins
-- **📈 Real-time Analytics**: Track ratings, sentiment, and waste patterns
+- **📈 Mess Optimization Dashboard**: Real-time analytics for waste reduction
 - **📊 Beautiful Charts**: Ratings over time, sentiment distribution, most wasted dishes
-- **🗑️ Wastage Tracker**: Log daily waste by dish, meal type, and quantity
-- **🎤 Feedback Insights**: Browse student voice transcripts with sentiment
-- **🗺️ NGO Donations**: Interactive map to find and schedule donations
-- **👥 Role Management**: Separate student and admin views
+- **🗑️ Wastage Tracker**: Log daily waste by dish, meal type, and quantity with trend analysis
+- **🎤 Feedback Insights**: Browse student voice transcripts with automated sentiment analysis
+- **🗺️ NGO Locator**: Interactive map to find nearby NGOs by distance and food type preferences
+- **📞 Instant Coordination**: Direct contact details for quick donation scheduling
+- **👥 Role Management**: Separate student and admin views with secure access control
 
 ### For NGOs
 - **📍 Location-Based Discovery**: Be found by nearby mess halls
@@ -191,22 +196,22 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🎯 Demo Flow (3 Minutes)
 
 ### Opening (30s)
-"Every day, college mess halls waste thousands of kg of food while millions go hungry. ZeroPlate bridges this gap."
+"Every day, college mess halls waste thousands of kg of food while millions go hungry nearby. ZeroPlate solves this through mess optimization and location-based NGO coordination."
 
 ### Problem (30s)
-Show the challenges: overproduction, no tracking, zero NGO connections, lost feedback.
+Show the challenges: overproduction, no tracking, zero NGO connections, no location-based discovery, lost feedback.
 
 ### Solution (45s)
-1. **Real-Time Analytics** - Track waste by dish/meal
-2. **Smart NGO Connections** - Interactive maps with filters
-3. **Voice-Powered Insights** - Voice-to-text feedback
+1. **Mess Optimization** - Real-time waste tracking and analytics
+2. **NGO Location Mapping** - Interactive maps with distance-based filters
+3. **Voice-Powered Insights** - Instant voice-to-text feedback
 
 ### Live Demo (60s)
-- **Student View**: Dashboard → Feedback with voice input
-- **Admin View**: Wastage tracker → Charts → NGO map
+- **Student View**: Dashboard → Voice feedback submission
+- **Admin View**: Wastage tracker → Optimization charts → NGO location map with filters
 
 ### Impact (15s)
-"Reduce waste by 50%, connect 100+ mess halls to NGOs, give students a voice."
+"Optimize mess operations, reduce waste by 50%, connect 100+ mess halls to nearby NGOs through location-based discovery, and give students a voice."
 
 ## �️ NGO Locations
 
@@ -227,12 +232,14 @@ ZeroPlate features 10 verified NGOs across major Indian cities:
 
 ## 🌟 Key Highlights
 
-- **Zero API Costs**: Uses free Leaflet + OpenStreetMap for maps
+- **Mess Optimization**: Data-driven insights reduce food waste and improve meal planning
+- **Location-Based NGO Discovery**: Interactive maps with distance filters (up to 50km radius)
+- **Zero API Costs**: Uses free Leaflet + OpenStreetMap for precise geolocation
 - **Serverless**: Fully powered by Firebase (scales automatically)
-- **Mobile-First**: Responsive design works on all devices
-- **Secure**: Firestore rules enforce role-based access
+- **Mobile-First**: Responsive design works on all devices with hamburger navigation
+- **Secure**: Firestore rules enforce role-based access control
 - **Fast**: Next.js App Router with optimized performance
-- **Professional UI**: Lucide icons throughout
+- **Professional UI**: Lucide icons and Tailwind CSS throughout
 
 ## 🔮 Future Enhancements
 
@@ -256,6 +263,7 @@ This is a hackathon project, but contributions are welcome! Feel free to:
 
 **ZeroPlate Team**
 - **Aksh Maheshwari** - Full Stack Development
+- **Aditi Agrawal** - Ai Integration + Ui Development
 
 ## 📄 License
 
